@@ -24,6 +24,8 @@ class MainActivity : ComponentActivity() {
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
                     )
+                    // TODO : aim navigation and add navigation dependency in gradle
+                    // Navigation(lifecycleOwner = this)
                 }
             }
         }
