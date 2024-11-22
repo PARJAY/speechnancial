@@ -1,6 +1,7 @@
 package com.example.speechnancial
 
 import android.os.Bundle
+import android.speech.SpeechRecognizer
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.speechnancial.ui.navigation.Navigation
 import com.example.speechnancial.ui.theme.SpeechnancialTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,30 +22,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             SpeechnancialTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                    // TODO : aim navigation and add navigation dependency in gradle
-                    // Navigation(lifecycleOwner = this)
+                     Navigation(innerPadding)
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SpeechnancialTheme {
-        Greeting("Android")
     }
 }

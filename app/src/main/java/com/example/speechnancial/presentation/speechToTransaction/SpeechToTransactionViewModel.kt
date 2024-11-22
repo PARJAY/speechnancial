@@ -1,16 +1,10 @@
-package com.example.speechnancial.presentation.transaction
+package com.example.speechnancial.presentation.speechToTransaction
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 
 // todo : not yet implemented
 // viwemodel
-class TransactionViewModel(
+class SpeechToTransactionViewModel(
 //    private val customerRepository: CustomerRepositoryImpl,
 //    customerId: String
 ): ViewModel() {
