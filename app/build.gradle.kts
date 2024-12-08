@@ -2,9 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
-    //    todo : add plugins
     id("com.google.devtools.ksp")
-//    id("org.jetbrains.kotlin.plugin.serialization")
+    id("kotlin-parcelize")
+
+    //    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -72,14 +73,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-//    todo : add depencencies
-
     // room
     implementation("androidx.room:room-runtime:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
-
-    // wear os?
 
     // coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
@@ -92,4 +89,7 @@ dependencies {
     // viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+    // GSON
+    implementation("com.google.code.gson:gson:2.11.0")
 }

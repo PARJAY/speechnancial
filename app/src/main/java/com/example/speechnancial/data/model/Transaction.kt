@@ -1,25 +1,36 @@
 package com.example.speechnancial.data.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.speechnancial.common.TransactionType
-import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
-import java.util.Date
+import com.example.speechnancial.ui.navigation.TransactionListScreenNavigation
+import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "transactions")
+@Parcelize
 data class Transaction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val rawText: String = "",
     val type: TransactionType = TransactionType.UNDEFINED,
-    val description: String = "",
-    val nominal: Float? = null,
-    // TODO : figure out later || error -> Cannot figure out how to save this field into database. You can consider adding a type converter for it.
-    val dateAdded: String = "",
-    val isTranscriptionCorrect: Boolean = true,
-    val isNeedRevise: Boolean = false
-)
+    val details: List<TransactionDetail>? = null,
+    val createdAt: Long? = null,
+    val isNeedRevise: Boolean = false,
+    val isValid: Boolean = true
+) : Parcelable {
+    fun validator(): Boolean {
+        if (type == TransactionType.UNDEFINED) return false
+        return details?.all { it.emptyChecker() } ?: false
+    }
+}
 
+@Parcelize
+data class TransactionDetail(
+    val description: String,
+    val nominal: Float
+) : Parcelable {
+    fun emptyChecker() = description.isNotEmpty() && nominal > 0
+}
 
 // catatan :
 // - jika ada kesalahan atau ketidak lengkapan dari transkripsi akan dimasukkan ke isTranscriptionCorrect = false

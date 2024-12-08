@@ -1,26 +1,23 @@
 package com.example.speechnancial.tools
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speechnancial.data.model.Transaction
 import com.example.speechnancial.presentation.PermissionRequestViewModel
-import com.example.speechnancial.presentation.speechToTransaction.SpeechToTransactionState
+import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionState
 import java.util.Locale
 
 @Composable
-fun rememberSpeechToTransactionState(): SpeechToTransactionState {
+fun rememberSpeechToTransactionState(): InputTransactionState {
     val context = LocalContext.current
     val viewModel = viewModel<PermissionRequestViewModel>()
 
@@ -36,7 +33,6 @@ fun rememberSpeechToTransactionState(): SpeechToTransactionState {
 
     val previousPartialResult = remember { mutableStateOf("") }
     val source = remember { mutableStateOf("") }
-    val splittedSource = remember { mutableListOf<String>() }
     val transactionResult = remember { mutableStateOf(Transaction()) }
     val isTranscribing = remember { mutableStateOf(false) }
     val isFinishedTranscribing = remember { mutableStateOf(false) }
@@ -54,12 +50,11 @@ fun rememberSpeechToTransactionState(): SpeechToTransactionState {
         )
     }
 
-    return SpeechToTransactionState(
+    return InputTransactionState(
         context,
         recordAudioPermissionResultLauncher,
         previousPartialResult,
         source,
-        splittedSource,
         transactionResult,
         isTranscribing,
         isFinishedTranscribing,

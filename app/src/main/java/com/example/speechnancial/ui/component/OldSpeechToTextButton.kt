@@ -20,9 +20,8 @@ import androidx.compose.ui.unit.dp
 import java.util.Locale
 import androidx.activity.compose.rememberLauncherForActivityResult as rememberLauncherForActivityResult1
 
-
 @Composable
-fun SpeechToTextButton(speechText: MutableState<String>) {
+fun OldSpeechToTextButton(speechText: MutableState<String>) {
     val launcher = rememberLauncherForActivityResult1(ActivityResultContracts.StartActivityForResult())
     { it : ActivityResult ->
         if (it.resultCode == Activity.RESULT_OK)

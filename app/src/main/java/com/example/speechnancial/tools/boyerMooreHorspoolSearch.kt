@@ -6,7 +6,7 @@ fun boyerMooreHorspoolSearch(
 ) : Int {
     val pattChar = pattern.toCharArray()
     val patternLength: Int = pattChar.size
-    if (patternLength == 0) return 0    // todo : what is this return 0
+    if (patternLength == 0) return 0    // return 0 artinya panjang char pada kata nggak sesuai
 
     val src = source.toCharArray()
     val srcLength: Int = src.size
@@ -21,9 +21,13 @@ fun boyerMooreHorspoolSearch(
         j = patternLength - 1
         while (source[i + j] == pattChar[j]) {
             j -= 1
-            if (j < 0) return i
+            if (j < 0) return i     // return i artinya ditemukan pada index char ke "i"
         }
         i += shift[src[i + patternLength - 1].code]
     }
-    return -1
+    return -1   // return -1 artinya tidak ditemukan
 }
+
+// string.isBoyerMooreSearchAvailable() {
+//
+// }

@@ -1,11 +1,13 @@
-package com.example.speechnancial.tools
+package com.example.speechnancial.tools.unused
 
 import androidx.compose.runtime.MutableState
 import com.example.speechnancial.common.TransactionType
 import com.example.speechnancial.data.model.Transaction
+import com.example.speechnancial.tools.boyerMooreHorspoolSearch
+import com.example.speechnancial.tools.findTransactionType
 
-// todo : now i dont even understand what im coding back then
-// todo : i want to update this
+// now i dont even understand what im coding back then
+// i want to update this
 //  functiontipe transaksi :
 //  - pisahkan kata pertama
 //  - cari apakah ada keyword transaction type
@@ -15,67 +17,67 @@ import com.example.speechnancial.data.model.Transaction
 //    -> jika rp cek kata dibelakangnya apakah ada juta atau 1-9
 //  -> cari apakah ada kata kunci rupiah
 //	  -> jika ada cek kata didepannya apakah ada juta atau 1-9
-fun separator(
-    splittedSource: List<String>,
-    transactionResult : MutableState<Transaction>
-) {
-    transactionResult.value = transactionResult.value.copy(
-        type = findTransactionType(splittedSource[0])
-    )
-
-    if (transactionResult.value.type == TransactionType.UNDEFINED)
-        transactionResult.value = transactionResult.value.copy(description = splittedSource[0])
-
-
-    // 2000 rupiah -> 2000
-    // rp2.000 -> 2000
-    // rp.2.000 -> 2000
-    // rp 2000 -> 2000
-    // rp. 2000 -> 2000
-
-    // kenapa user nggak bisa setting setting aja nih
-    // input nominal template
-        // rp[nominal]
-        // rp.[nominal]
-        // rp [nominal]
-        // rp. [nominal]
-        // [nominal] rupiah
-    val penandaRupiah = "rupiah"
-    val penandaRp = "rp"
-    val penandaRp2 = "rp."
-
-    // Step 2: Loop pada kata-kata berikutnya
-    var i = 1
-    while (i < splittedSource.size) {
-        val currentWord = splittedSource[i]
-
-        val isNumeric = currentWord.toFloatOrNull() != null
-
-        if (isNumeric) {
-            if (
-                i + 1 < splittedSource.size &&
-                boyerMooreHorspoolSearch(splittedSource[i + 1], penandaRupiah) != -1
-            ) {
-                transactionResult.value = transactionResult.value.copy(
-                    nominal = (currentWord + " " + splittedSource[i + 1]).toFloat()
-                )
-                i++
-            } else
-                transactionResult.value = transactionResult.value.copy(
-                    description = transactionResult.value.description + " $currentWord"
-                )
-        }
-        else if (boyerMooreHorspoolSearch(currentWord, penandaRp) != -1)
-            transactionResult.value = transactionResult.value.copy(
-                nominal = (currentWord.split("rp").joinToString(separator = "").split(".").joinToString("")).toFloat()
-            )
-        else
-            transactionResult.value = transactionResult.value.copy(
-                description = transactionResult.value.description + " $currentWord"
-            )
-        i++
-    }
-}
+//fun textToTransactionConverterBM(
+//    splittedSource: List<String>,
+//    transactionResult : MutableState<Transaction>
+//) {
+//    transactionResult.value = transactionResult.value.copy(
+//        type = findTransactionType(splittedSource[0])
+//    )
+//
+//    if (transactionResult.value.type == TransactionType.UNDEFINED)
+//        transactionResult.value = transactionResult.value.copy(details = splittedSource[0])
+//
+//
+//    // 2000 rupiah -> 2000
+//    // rp2.000 -> 2000
+//    // rp.2.000 -> 2000
+//    // rp 2000 -> 2000
+//    // rp. 2000 -> 2000
+//
+//    // kenapa user nggak bisa setting setting aja nih
+//    // input nominal template
+//    // rp[nominal]
+//    // rp.[nominal]
+//    // rp [nominal]
+//    // rp. [nominal]
+//    // [nominal] rupiah
+//    val penandaRupiah = "rupiah"
+//    val penandaRp = "rp"
+//    val penandaRp2 = "rp."
+//
+//    // Step 2: Loop pada kata-kata berikutnya
+//    var i = 1
+//    while (i < splittedSource.size) {
+//        val currentWord = splittedSource[i]
+//
+//        val isNumeric = currentWord.toFloatOrNull() != null
+//
+//        if (isNumeric) {
+//            if (
+//                i + 1 < splittedSource.size &&
+//                boyerMooreHorspoolSearch(splittedSource[i + 1], penandaRupiah) != -1
+//            ) {
+//                transactionResult.value = transactionResult.value.copy(
+//                    nominal = (currentWord + " " + splittedSource[i + 1]).toFloat()
+//                )
+//                i++
+//            } else
+//                transactionResult.value = transactionResult.value.copy(
+//                    description = transactionResult.value.description + " $currentWord"
+//                )
+//        }
+//        else if (boyerMooreHorspoolSearch(currentWord, penandaRp) != -1)
+//            transactionResult.value = transactionResult.value.copy(
+//                nominal = (currentWord.split("rp").joinToString(separator = "").split(".").joinToString("")).toFloat()
+//            )
+//        else
+//            transactionResult.value = transactionResult.value.copy(
+//                description = transactionResult.value.description + " $currentWord"
+//            )
+//        i++
+//    }
+//}
 
 
 // older function

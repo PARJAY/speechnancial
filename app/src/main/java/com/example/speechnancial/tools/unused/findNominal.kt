@@ -1,4 +1,7 @@
-package com.example.speechnancial.tools
+package com.example.speechnancial.tools.unused
+
+import com.example.speechnancial.tools.boyerMooreHorspoolSearch
+import com.example.speechnancial.tools.floatOrString
 
 // simple case
 // parkir rp.2000

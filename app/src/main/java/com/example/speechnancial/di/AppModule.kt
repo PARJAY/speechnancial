@@ -1,6 +1,8 @@
 package com.example.speechnancial.di
 
-// todo : database and repository
-interface AppModule {
+import com.example.speechnancial.data.db.AppDatabase
 
+interface AppModule {
+    val database: AppDatabase
 }
+

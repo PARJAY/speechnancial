@@ -14,8 +14,6 @@ fun startSpeechToText(
     speechRecognizerIntent: Intent,
     onPartialResults: (String) -> Unit
 ) {
-    var previousPartialResult = ""
-
     speechRecognizer.setRecognitionListener(object : RecognitionListener {
         override fun onReadyForSpeech(bundle: Bundle?) {}
         override fun onBeginningOfSpeech() {}
@@ -47,7 +45,6 @@ fun startSpeechToText(
         override fun onPartialResults(bundle: Bundle) {
             val partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
 
-            // TODO : this "partialResults.size > 0" isnt checked yet, may result to error
             if (partialResults != null && partialResults.size > 0) {
                 onPartialResults(partialResults[0])
                 Log.d("partialResults", partialResults[0])
