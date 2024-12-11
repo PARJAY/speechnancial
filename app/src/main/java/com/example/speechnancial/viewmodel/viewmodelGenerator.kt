@@ -1,10 +1,10 @@
-package com.example.speechnancial.presentation
+package com.example.speechnancial.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speechnancial.data.db.AppDatabase
-import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionViewModel
-import com.example.speechnancial.presentation.transactionListScreen.TransactionListViewModel
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionViewModel
+import com.example.speechnancial.viewmodel.transactionListScreen.TransactionListViewModel
 
 @Composable
 fun makeInputTransactionVM(db : AppDatabase) : InputTransactionViewModel {

@@ -1,4 +1,4 @@
-package com.example.speechnancial.presentation.inputTransactionScreen
+package com.example.speechnancial.viewmodel.inputTransactionScreen
 
 import android.content.Context
 import android.content.Intent

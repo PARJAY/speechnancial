@@ -1,7 +1,7 @@
 package com.example.speechnancial.tools.inputTransactionScreen
 
 import android.Manifest
-import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionState
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
 import com.example.speechnancial.tools.createTransactionFromInput
 import com.example.speechnancial.tools.startSpeechToText
 
@@ -32,9 +32,8 @@ fun recordTransactionHandler(state: InputTransactionState) {
         state.speechRecognizer.value.stopListening()
         state.speechRecognizer.value.destroy()
 
-        createTransactionFromInput(
-            (state.source.value + state.previousPartialResult.value).lowercase(),
-            state.transaction
+        state.transaction.value = createTransactionFromInput(
+            (state.source.value + state.previousPartialResult.value).lowercase()
         )
     }
 }

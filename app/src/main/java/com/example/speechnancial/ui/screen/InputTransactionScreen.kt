@@ -18,8 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.speechnancial.R
-import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionEvent
-import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionState
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionEvent
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
 import com.example.speechnancial.ui.component.CustomCheckbox
 import com.example.speechnancial.ui.component.TransactionDisplayerItem
 import com.example.speechnancial.ui.navigation.TransactionListScreenNavigation

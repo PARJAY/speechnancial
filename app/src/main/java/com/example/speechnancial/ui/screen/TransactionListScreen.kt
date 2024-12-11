@@ -1,19 +1,23 @@
 package com.example.speechnancial.ui.screen
 
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import com.example.speechnancial.presentation.transactionListScreen.TransactionListEvent
-import com.example.speechnancial.presentation.transactionListScreen.TransactionListState
+import com.example.speechnancial.data.model.WalletBalanceAndHistory
+import com.example.speechnancial.viewmodel.transactionListScreen.TransactionListEvent
+import com.example.speechnancial.viewmodel.transactionListScreen.TransactionListState
 import com.example.speechnancial.ui.component.TransactionDisplayerItem
+import com.example.speechnancial.ui.component.transactionListScreen.WalletBalanceAndHistoryDisplayer
 import com.example.speechnancial.ui.component.transactionListScreen.DialogEditTransaction
+import com.example.speechnancial.ui.component.transactionListScreen.TransactionItem
 
 @Composable
 fun TransactionListScreen(
     state: State<TransactionListState>,
-    onEvent: (TransactionListEvent) -> Unit
+    onEvent: (TransactionListEvent) -> Unit,
 ) {
     // dialog box composable fun
     if (state.value.showUpdateTransactionDialog)
@@ -26,24 +30,31 @@ fun TransactionListScreen(
                 onEvent(TransactionListEvent.HandleUserInput(it))
             },
             onConfirmUpdate = {
-                onEvent(TransactionListEvent.UpdateSelectedTransaction)
+                onEvent(TransactionListEvent.DialogActionUpdateSelectedTransaction)
                 onEvent(TransactionListEvent.HideDialog)
             }
         )
 
     LazyColumn {
         item {
-            Text("TransactionListScreen")
+            WalletBalanceAndHistoryDisplayer(
+                false,
+                onFilterEarningClick = { onEvent(TransactionListEvent.FilterEarningButtonClick) },
+                false,
+                onFilterSpendingClick = { onEvent(TransactionListEvent.FilterSpendingButtonClick) },
+                WalletBalanceAndHistory()
+            )
         }
 
         items(state.value.transactionList) { transaction ->
-            TransactionDisplayerItem(
-                transaction,
-                onItemClick = {
-                    onEvent(TransactionListEvent.ShowDialog(transaction))
-                }
+            TransactionItem(
+                transaction = transaction.transaction,
+                isExpanded = transaction.isExpanded,
+                onItemClick = {},
+                onDropdownClick = {}
             )
         }
+
     }
 }
 

@@ -1,4 +1,4 @@
-package com.example.speechnancial.presentation
+package com.example.speechnancial.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

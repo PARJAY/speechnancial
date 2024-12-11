@@ -3,9 +3,10 @@ package com.example.speechnancial.data.model
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.example.speechnancial.common.TransactionType
-import com.example.speechnancial.ui.navigation.TransactionListScreenNavigation
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDateTime
 
 @Entity(tableName = "transactions")
 @Parcelize
@@ -14,8 +15,10 @@ data class Transaction(
     val rawText: String = "",
     val type: TransactionType = TransactionType.UNDEFINED,
     val details: List<TransactionDetail>? = null,
-    val createdAt: Long? = null,
+    val total : Float = 0f,
+    val createdAt: LocalDateTime? = null,
     val isNeedRevise: Boolean = false,
+    val transcriptionError: Boolean = false,
     val isValid: Boolean = true
 ) : Parcelable {
     fun validator(): Boolean {
@@ -26,12 +29,8 @@ data class Transaction(
 
 @Parcelize
 data class TransactionDetail(
-    val description: String,
-    val nominal: Float
+    val description: String = "",
+    val nominal: Float = 0f
 ) : Parcelable {
     fun emptyChecker() = description.isNotEmpty() && nominal > 0
 }
-
-// catatan :
-// - jika ada kesalahan atau ketidak lengkapan dari transkripsi akan dimasukkan ke isTranscriptionCorrect = false
-// - jika user tidak sengaja menginputkan kata-kata yang salah, akan dimasukkan ke isNeedRevise = true

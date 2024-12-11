@@ -9,8 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.speechnancial.MyApp
-import com.example.speechnancial.presentation.makeInputTransactionVM
-import com.example.speechnancial.presentation.makeTransactionListVM
+import com.example.speechnancial.viewmodel.makeInputTransactionVM
+import com.example.speechnancial.viewmodel.makeTransactionListVM
 import com.example.speechnancial.tools.rememberSpeechToTransactionState
 import com.example.speechnancial.ui.screen.InputTransactionScreen
 import com.example.speechnancial.ui.screen.TransactionListScreen

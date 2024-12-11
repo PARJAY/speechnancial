@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.speechnancial.data.dao.TransactionDao
+import com.example.speechnancial.data.model.DateConverter
 import com.example.speechnancial.data.model.Transaction
 import com.example.speechnancial.data.model.TransactionConverter
 

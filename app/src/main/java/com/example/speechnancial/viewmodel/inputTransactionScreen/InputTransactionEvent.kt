@@ -1,4 +1,4 @@
-package com.example.speechnancial.presentation.inputTransactionScreen
+package com.example.speechnancial.viewmodel.inputTransactionScreen
 
 import com.example.speechnancial.data.model.Transaction
 

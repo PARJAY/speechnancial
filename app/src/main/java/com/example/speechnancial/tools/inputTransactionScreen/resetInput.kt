@@ -1,6 +1,6 @@
 package com.example.speechnancial.tools.inputTransactionScreen
 
-import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionState
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
 
 fun resetInput(state: InputTransactionState) {
     state.source.value = ""

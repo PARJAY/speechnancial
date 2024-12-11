@@ -1,4 +1,4 @@
-package com.example.speechnancial.presentation.inputTransactionScreen
+package com.example.speechnancial.viewmodel.inputTransactionScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

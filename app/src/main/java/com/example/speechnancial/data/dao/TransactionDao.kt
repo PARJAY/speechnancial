@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.speechnancial.data.model.Transaction
+import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -22,4 +23,7 @@ interface TransactionDao {
 
     @Delete
     suspend fun deleteTransaction(transaction: Transaction)
+
+    @Query("SELECT * FROM transactions ORDER BY createdAt DESC")
+    fun getAllSortedTransactions(): Flow<List<Transaction>>
 }

@@ -12,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.speechnancial.data.model.Transaction
-import com.example.speechnancial.presentation.PermissionRequestViewModel
-import com.example.speechnancial.presentation.inputTransactionScreen.InputTransactionState
+import com.example.speechnancial.viewmodel.PermissionRequestViewModel
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
 import java.util.Locale
 
 @Composable

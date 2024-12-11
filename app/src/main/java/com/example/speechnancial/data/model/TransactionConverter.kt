@@ -3,9 +3,10 @@ package com.example.speechnancial.data.model
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.util.Date
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
-    class TransactionConverter {
+class TransactionConverter {
     @TypeConverter
     fun fromList(details: List<TransactionDetail>): String {
         return Gson().toJson(details)
@@ -18,12 +19,13 @@ import java.util.Date
     }
 
     @TypeConverter
-    fun fromTimestamp(value: Long): Date {
-        return Date(value)
+    fun fromTimestamp(value: String?): LocalDateTime? {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        return value?.let { LocalDateTime.parse(it, formatter) }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: Date): Long {
-        return date.time
+    fun dateToString(date: LocalDateTime?): String? {
+        return date?.toString()
     }
 }

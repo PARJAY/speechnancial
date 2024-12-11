@@ -3,6 +3,8 @@ package com.example.speechnancial.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import com.example.speechnancial.data.datastore.WalletDataStoreManager
+import com.example.speechnancial.data.datastore.dataStore
 import com.example.speechnancial.data.db.AppDatabase
 
 class AppModuleImpl(
@@ -14,5 +16,9 @@ class AppModuleImpl(
         Room.databaseBuilder(appContext, AppDatabase::class.java, "transaction.db")
             .fallbackToDestructiveMigration()
             .build()
+    }
+
+    override val wallet: WalletDataStoreManager by lazy {
+        WalletDataStoreManager.getInstance(application.dataStore)
     }
 }
