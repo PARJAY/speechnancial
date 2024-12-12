@@ -19,13 +19,13 @@ class TransactionListViewModel(private val transactionDao: TransactionDao) : Vie
 
     val state = combine(_state, _transaction) { state, transaction ->
         state.copy(
-            transactionList = transaction.map { TransactionItemState(it, false) }
+            transactionList = transaction
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TransactionListState())
 
     fun onEvent(event : TransactionListEvent) {
         when(event) {
-            is TransactionListEvent.ShowDialog -> {
+            is TransactionListEvent.TransactionItemOnClickShowDialog -> {
                 _state.update { it.copy(
                     selectedTransaction = event.transaction,
                     showUpdateTransactionDialog = true

@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +42,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun TransactionItem(
     transaction: Transaction,
-    isExpanded: Boolean,
+    isExpanded : Boolean,
     onItemClick: () -> Unit,
     onDropdownClick: () -> Unit,
 ) {
@@ -73,7 +75,7 @@ fun TransactionItem(
                 )
                 Text(
 
-                    text = transaction.createdAt?.format(DateTimeFormatter.ofPattern("HH:mm")).toString(),
+                    text = transaction.createdAt?.format(DateTimeFormatter.ofPattern("HH:mm")).toString() + " | dropdown state : $isExpanded",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.secondary
                 )

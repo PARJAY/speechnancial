@@ -20,7 +20,7 @@ class TransactionConverter {
 
     @TypeConverter
     fun fromTimestamp(value: String?): LocalDateTime? {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
         return value?.let { LocalDateTime.parse(it, formatter) }
     }
 

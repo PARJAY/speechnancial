@@ -31,14 +31,6 @@ fun startSpeechToText(
         }
 
         override fun onResults(bundle: Bundle) {
-//            val result = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-//            if (result != null && result[0] != null) {
-//                onResults(result[0])
-//                Log.d("onResults", result[0])
-//            }
-//            Log.d("onResults", "result : " + result?.joinToString(prefix = "[",
-//                separator = ":",
-//                postfix = "]",))
             speechRecognizer.startListening(speechRecognizerIntent)
         }
 
@@ -47,11 +39,8 @@ fun startSpeechToText(
 
             if (partialResults != null && partialResults.size > 0) {
                 onPartialResults(partialResults[0])
-                Log.d("partialResults", partialResults[0])
+//                Log.d("partialResults", partialResults[0])
             }
-//            Log.d("partialResults", "partialResults : " + partialResults?.joinToString(prefix = "[",
-//                separator = ":",
-//                postfix = "]",))
         }
 
         override fun onEvent(i: Int, bundle: Bundle?) {}

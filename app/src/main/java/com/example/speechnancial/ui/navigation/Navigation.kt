@@ -1,5 +1,6 @@
 package com.example.speechnancial.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -35,7 +36,7 @@ fun Navigation(innerPadding : PaddingValues) {
 
         composable<TransactionListScreenNavigation> {
             val transactionListVM = makeTransactionListVM(MyApp.appModule.database)
-            val state = transactionListVM.state.collectAsStateWithLifecycle()
+            val state = transactionListVM.state.collectAsStateWithLifecycle().value
 
             TransactionListScreen(state, transactionListVM::onEvent)
         }
