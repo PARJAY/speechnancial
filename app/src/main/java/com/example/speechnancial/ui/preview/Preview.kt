@@ -14,23 +14,7 @@ import com.example.speechnancial.ui.theme.SpeechnancialTheme
 import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
 import com.example.speechnancial.viewmodel.transactionListScreen.WalletQuickHistory
 
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun TransactionItemPreview(
-    @PreviewParameter(TransactionItemPreviewParameterProvider::class) state : TransactionItemState
-) {
-    SpeechnancialTheme {
-        Surface {
-            ProposedTransaction(
-                transaction = state.transaction,
-                isExpanded = state.isExpanded,
-                onItemClick = {},
-                onDropdownClick = {}
-            )
-        }
-    }
-}
+// todo : add remaining preview
 
 @PreviewLightDark
 @Composable
@@ -52,8 +36,8 @@ fun TransactionListScreenPreview(
     }
 }
 
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+// todo : dirty and duplicate code, revise later
+@PreviewLightDark
 @Composable
 fun ProposedTransactionPreview(
     @PreviewParameter(TransactionItemPreviewParameterProvider::class) state : TransactionItemState
@@ -62,9 +46,39 @@ fun ProposedTransactionPreview(
         Surface {
             ProposedTransaction(
                 transaction = state.transaction,
-                isExpanded = state.isExpanded,
-                onItemClick = {},
-                onDropdownClick = {}
+                isEditExistingTransaction = true,
+
+                onConfirmButtonClick = {},
+                onDeleteButtonClick = {},
+
+                isReviseNeeded = true,
+                onReviseNeededClick = {},
+                isTransacribtionError = false,
+                onTransacribtionErrorClick = {},
+            )
+        }
+    }
+}
+
+// todo : dirty and duplicate code, revise later
+@PreviewLightDark
+@Composable
+fun ProposedTransactionPreview2(
+    @PreviewParameter(TransactionItemPreviewParameterProvider::class) state : TransactionItemState
+) {
+    SpeechnancialTheme {
+        Surface {
+            ProposedTransaction(
+                transaction = state.transaction,
+                isEditExistingTransaction = false,
+
+                onConfirmButtonClick = {},
+                onDeleteButtonClick = {},
+
+                isReviseNeeded = false,
+                onReviseNeededClick = {},
+                isTransacribtionError = true,
+                onTransacribtionErrorClick = {},
             )
         }
     }

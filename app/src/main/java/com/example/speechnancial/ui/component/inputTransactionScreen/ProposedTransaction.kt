@@ -9,20 +9,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -31,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,14 +37,20 @@ import com.example.speechnancial.ui.preview.TransactionItemPreviewParameterProvi
 import com.example.speechnancial.ui.theme.SpeechnancialTheme
 import com.example.speechnancial.ui.theme.transpernt
 import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun ProposedTransaction(
     transaction: Transaction,
-    isExpanded: Boolean,
-    onItemClick: () -> Unit,
-    onDropdownClick: () -> Unit,
+    isEditExistingTransaction: Boolean,
+
+    onConfirmButtonClick: () -> Unit,
+    onDeleteButtonClick: () -> Unit,
+
+    isReviseNeeded: Boolean,
+    onReviseNeededClick: () -> Unit,
+
+    isTransacribtionError: Boolean,
+    onTransacribtionErrorClick: () -> Unit,
 ) {
     Column (
         Modifier
@@ -64,8 +63,7 @@ fun ProposedTransaction(
                     topEnd = 16.dp,
                 )
             )
-            .padding(16.dp)
-            .clickable { onItemClick() },
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // avoiding gap content
@@ -108,68 +106,84 @@ fun ProposedTransaction(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Checkbox(
-                checked = true,
-                onCheckedChange = {
-                    // todo
-                },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.onTertiary,
-                    checkmarkColor = Color.White
-                ),
-
-                //below line is uses an interaction source
-                // that handles interaction events for the checkbox
-                interactionSource = remember { MutableInteractionSource() }
+            CompactCheckbox(
+                isChecked = isReviseNeeded,
+                onCheckedChange = { onReviseNeededClick() },
+                text = "Revisi Nanti"
             )
-            Text(
-                "Revisi Nanti",
-//                fontSize = 12.sp,
-            )
-
-            Checkbox(
-                checked = false,
-                onCheckedChange = {
-                    // todo
-                },
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.onTertiary,
-                    checkmarkColor = Color.White
-                ),
-
-                //below line is uses an interaction source
-                // that handles interaction events for the checkbox
-                interactionSource = remember { MutableInteractionSource() }
-            )
-            Text(
-                "kesalahan Transkripsi",
-//                fontSize = 12.sp,
+            CompactCheckbox(
+                isChecked = isTransacribtionError,
+                onCheckedChange = { onTransacribtionErrorClick() },
+                text = "Kesalahan Transkripsi"
             )
         }
 
-        Button(
-            onClick = {},
-            Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonColors(
-                containerColor = MaterialTheme.colorScheme.tertiary,
-                contentColor = MaterialTheme.colorScheme.primary,
-                disabledContentColor = transpernt,
-                disabledContainerColor = transpernt
-            ),
+        Row {
+            if(isEditExistingTransaction) {
+                CompactButton(
+                    onClick = { onDeleteButtonClick() },
+                    text = "Hapus"
+                )
 
-        ) {
+                Spacer(Modifier.padding(16.dp))
+            }
 
-            Text(
-                "Simpan",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
+            CompactButton(
+                onClick = { onConfirmButtonClick() },
+                text = "Simpan"
             )
+
         }
     }
 }
 
+@Composable
+fun CompactButton(onClick: () -> Unit, text: String) {
+    Button(
+        onClick = { onClick() },
+        Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonColors(
+            containerColor = MaterialTheme.colorScheme.tertiary,
+            contentColor = MaterialTheme.colorScheme.primary,
+            disabledContentColor = transpernt,
+            disabledContainerColor = transpernt
+        ),
 
+        ) {
+
+        Text(
+            text,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+        )
+    }
+}
+
+@Composable
+fun CompactCheckbox(
+    isChecked: Boolean,
+    onCheckedChange: () -> Unit,
+    text: String
+) {
+    Checkbox(
+        checked = isChecked,
+        onCheckedChange = {
+            onCheckedChange()
+        },
+        colors = CheckboxDefaults.colors(
+            checkedColor = MaterialTheme.colorScheme.onTertiary,
+            checkmarkColor = Color.White
+        ),
+
+        //below line is uses an interaction source
+        // that handles interaction events for the checkbox
+        interactionSource = remember { MutableInteractionSource() }
+    )
+    Text(text)
+}
+
+// todo : dirty and duplicate code, revise later
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
@@ -180,9 +194,40 @@ fun ProposedTransactionPreview(
         Surface {
             ProposedTransaction(
                 transaction = state.transaction,
-                isExpanded = state.isExpanded,
-                onItemClick = {},
-                onDropdownClick = {}
+                isEditExistingTransaction = true,
+
+                onConfirmButtonClick = {},
+                onDeleteButtonClick = {},
+
+                isReviseNeeded = true,
+                onReviseNeededClick = {},
+                isTransacribtionError = false,
+                onTransacribtionErrorClick = {},
+            )
+        }
+    }
+}
+
+// todo : dirty and duplicate code, revise later
+@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Composable
+fun ProposedTransactionPreview2(
+    @PreviewParameter(TransactionItemPreviewParameterProvider::class) state : TransactionItemState
+) {
+    SpeechnancialTheme {
+        Surface {
+            ProposedTransaction(
+                transaction = state.transaction,
+                isEditExistingTransaction = false,
+
+                onConfirmButtonClick = {},
+                onDeleteButtonClick = {},
+
+                isReviseNeeded = false,
+                onReviseNeededClick = {},
+                isTransacribtionError = true,
+                onTransacribtionErrorClick = {},
             )
         }
     }

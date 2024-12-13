@@ -17,8 +17,8 @@ data class Transaction(
     val details: List<TransactionDetail>? = null,
     val total : Float = 0f,
     val createdAt: LocalDateTime? = null,
-    val isNeedRevise: Boolean = false,
-    val transcriptionError: Boolean = false,
+    val isReviseNeeded: Boolean = false,
+    val isTranscriptionError: Boolean = false,
     val isValid: Boolean = true
 ) : Parcelable {
     fun validator(): Boolean {

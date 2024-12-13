@@ -15,8 +15,12 @@ fun main() {
     descriptionExtractor(text, nominals)
 }
 
+// todo :
+//  val transactions = mutableListOf<Pair<String, String>>()
+//  the string that hold nominal might null / empty
+//  suggestion change type to mutableListOf<Pair<String, String?>>()
 fun descriptionExtractor(text: String, nominals: Sequence<String>) : MutableList<Pair<String, String>> {
-    val processedNominals = mutableListOf<String>() // To track previously seen nominals
+    val processedNominals = mutableListOf<String>()
     val transactions = mutableListOf<Pair<String, String>>()
 
     for (nominal in nominals) {

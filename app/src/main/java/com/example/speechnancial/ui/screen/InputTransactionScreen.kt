@@ -1,159 +1,205 @@
 package com.example.speechnancial.ui.screen
 
-import androidx.compose.foundation.BorderStroke
+import android.content.res.Resources
+import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.sp
 import com.example.speechnancial.R
+import com.example.speechnancial.ui.component.inputTransactionScreen.ProposedTransaction
+import com.example.speechnancial.ui.preview.InputTransactionScreenPreviewParameterProvider
+import com.example.speechnancial.ui.theme.SpeechnancialTheme
 import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionEvent
 import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
-import com.example.speechnancial.ui.component.CustomCheckbox
-import com.example.speechnancial.ui.component.TransactionDisplayerItem
-import com.example.speechnancial.ui.navigation.TransactionListScreenNavigation
-import com.example.speechnancial.tools.inputTransactionScreen.recordTransactionHandler
-import com.example.speechnancial.tools.inputTransactionScreen.resetInput
 
 @Composable
 fun InputTransactionScreen(
-    navController: NavController,
-    state: InputTransactionState,
-    onEvent: (InputTransactionEvent) -> Unit
+    inputTransactionState: InputTransactionState,
+    onEvent: (InputTransactionEvent) -> Unit,
+    getRecordAudioPermission: () -> Unit,
 ) {
+    val context = LocalContext.current
+
     Column {
-        Text(
-            text =
-            if (state.source.value.isEmpty() && state.previousPartialResult.value.isEmpty())
-                "Transkripsi Anda akan tampil disini"
-            else state.source.value + state.previousPartialResult.value
-        )
-
-        OutlinedButton(
-            onClick = { recordTransactionHandler(state) },
+        Box (
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(150.dp)
-                .padding(24.dp),  //avoid the oval shape
-            shape = CircleShape,
-            border = BorderStroke(1.dp, if (state.isTranscribing.value) Color.Green else Color.Gray),
-            contentPadding = PaddingValues(0.dp),  //avoid the little icon
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Blue)
+                .fillMaxWidth(1f)
+                .padding(horizontal = 24.dp)
+                .weight(1f),
         ) {
-            Icon(
-                painterResource(R.drawable.ic_mic),
-                contentDescription = "microphone",
-                tint = if (state.isTranscribing.value) Color.Green else Color.Gray
+            // todo belum bisa diketik
+            Text(
+                text =
+                if (inputTransactionState.source.isEmpty() && inputTransactionState.previousPartialResult.isEmpty())
+                    "Hasil transkripsi Anda Akan Muncul Disini editable by voice or keyboard"
+                else inputTransactionState.source + inputTransactionState.previousPartialResult,
+                color = MaterialTheme.colorScheme.secondary,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
             )
         }
 
-        CustomCheckbox(
-            isChecked = state.transaction.value.isNeedRevise,
-            text = "Edit Later?",
-            isEnabled = state.isFinishedTranscribing.value,
-            onCheckedChange = { newValue ->
-                state.updateTransaction { copy(isNeedRevise = newValue) }
+        Row (
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+        ) {
+            if (inputTransactionState.proposedTransaction.rawText.isNotEmpty()) {
+                CompactFAB(
+                    icons = Icons.Filled.Refresh,
+                    isActive = false,
+                    onClick = {
+                        onEvent(InputTransactionEvent.ResetButtonClicked)
+                    },
+                    contentDescription = "reset input icon"
+                )
+
+                Spacer(Modifier.padding(8.dp))
             }
-        )
 
-        if (state.source.value.isEmpty() && state.previousPartialResult.value.isEmpty())
-            Text("Transaksi sah akan muncul disini")
-        else
-            TransactionDisplayerItem(
-                state.transaction.value,
-                onItemClick = { }
+            CompactFAB(
+                painterResources = painterResource(R.drawable.ic_mic),
+                isActive = inputTransactionState.isTranscribing,
+                onClick = {
+                    getRecordAudioPermission()
+                    onEvent(InputTransactionEvent.SpeechToTransactionButtonClicked(context))
+                },
+                contentDescription = "mic icon"
             )
-
-        Button(
-            onClick = { resetInput(state) },
-            enabled = state.isFinishedTranscribing.value
-        ) {
-            Text("Reset")
         }
 
-        Button(
-            onClick = {
-                onEvent(InputTransactionEvent.SaveTransaction(state.transaction.value))
-                navController.navigate(TransactionListScreenNavigation)
-            },
-            enabled = state.isFinishedTranscribing.value
-        ) {
-            Text("Finished")
-        }
+        if (inputTransactionState.proposedTransaction.rawText.isNotEmpty())
+            ProposedTransaction(
+                inputTransactionState.proposedTransaction,
+                inputTransactionState.isEditExistingTransaction,
 
-        Button(onClick = {
-            navController.navigate(TransactionListScreenNavigation)
-        }) {
-            Text("Transaction List")
-        }
+                onConfirmButtonClick = {
+                    onEvent(InputTransactionEvent.SaveTransaction)
+                },
+                onDeleteButtonClick = {
+                    onEvent(InputTransactionEvent.DeleteTransaction)
+                },
+
+                isReviseNeeded = inputTransactionState.isReviseNeeded,
+                onReviseNeededClick = {
+                    onEvent(InputTransactionEvent.ReviseLaterCheckboxClicked)
+                },
+
+                isTransacribtionError = inputTransactionState.isTranscriptionError,
+                onTransacribtionErrorClick = {
+                    onEvent(InputTransactionEvent.TranscriptionErrorCheckboxClicked)
+                }
+            )
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun SpeechToTransactionPreview() {
-//    val state = rememberSpeechToTransactionState()
-//    val navController = rememberNavController()
-//    SpeechnancialTheme { SpeechToTransaction(state, navController, null) }
-//}
+@Composable
+fun CompactFAB(
+    icons: ImageVector,
+    onClick: () -> Unit,
+    isActive: Boolean,
+    contentDescription: String
+) {
+    FloatingActionButton(
+        onClick = { onClick() },
+        containerColor =
+        if (isActive) MaterialTheme.colorScheme.tertiary
+        else MaterialTheme.colorScheme.background,
 
-// cant be previewed
+        contentColor =
+        if (isActive) MaterialTheme.colorScheme.background
+        else MaterialTheme.colorScheme.primary,
 
-//@Preview(showBackground = true)
-//@Composable
-//fun InputTransactionScreenPreview() {
-//
-//    val context = LocalContext.current
-//    val p : SpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-//    SpeechnancialTheme {
-//
-//        val dummyStringState = remember { mutableStateOf("") }
-//        val dummyBoolState = remember { mutableStateOf(false) }
-//        val speechRecognizer = remember { mutableStateOf(p) }
-//        val dummySpeechRecognizerIntentState = remember { mutableStateOf(Intent()) }
-//        val dummyTransacrionState = remember { mutableStateOf(Transaction())}
-//
-//        val dummyState = SpeechToTransactionState(
-//            context = context,
-//            recordAudioPermissionResultLauncher = DummyActivityResultLauncher(
-//                DummyPermissionContract()
-//            ),
-//            previousPartialResult = dummyStringState,
-//            source = dummyStringState,
-//            splittedSource = mutableListOf(),
-//            transaction = dummyTransacrionState,
-//            isTranscribing = dummyBoolState,
-//            speechRecognizer = speechRecognizer,
-//            speechRecognizerIntent = dummySpeechRecognizerIntentState
-//        )
-//        val navController = rememberNavController()
-//        InputTransactionScreen(navController, dummyState)
-//    }
-//}
-//
-//// Dummy implementation of ActivityResultContract
-//class DummyPermissionContract : ActivityResultContract<String, Boolean>() {
-//    override fun createIntent(context: Context, input: String): Intent {
-//
-//    }
-//
-//    override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
-//        return true // Assume permission is granted in the dummy contract
-//    }
-//}
-//
-//// Dummy implementation for ActivityResultLauncher for preview
-//class DummyActivityResultLauncher(override val contract: ActivityResultContract<String, *>) : ActivityResultLauncher<String>() {
-//    override fun launch(input: String, options: ActivityOptionsCompat?) {}
-//    override fun unregister() {}
-//}
+        shape = CircleShape,
+        modifier = Modifier
+            .padding(vertical = 16.dp)
+            .border(
+                width = 2.dp,
+                MaterialTheme.colorScheme.tertiary,
+                shape = CircleShape
+            )
+    ) {
+        Icon(
+            icons,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = contentDescription,
+        )
+    }
+}
+
+@Composable
+fun CompactFAB(
+    painterResources: Painter,
+    onClick: () -> Unit,
+    isActive: Boolean,
+    contentDescription: String
+) {
+    FloatingActionButton(
+        onClick = { onClick() },
+        containerColor =
+        if (isActive) MaterialTheme.colorScheme.tertiary
+        else MaterialTheme.colorScheme.background,
+
+        contentColor =
+        if (isActive) MaterialTheme.colorScheme.background
+        else MaterialTheme.colorScheme.primary,
+
+        shape = CircleShape,
+        modifier = Modifier
+            .padding(vertical = 16.dp)
+            .border(
+                width = 2.dp,
+                MaterialTheme.colorScheme.tertiary,
+                shape = CircleShape
+            )
+    ) {
+        Icon(
+            painterResources,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = contentDescription,
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+fun InputTransactionScreenPreview(
+    @PreviewParameter(InputTransactionScreenPreviewParameterProvider::class) state : InputTransactionState
+) {
+    SpeechnancialTheme {
+        Surface {
+            InputTransactionScreen(
+                state,
+                onEvent = {},
+                getRecordAudioPermission = {}
+            )
+        }
+    }
+}

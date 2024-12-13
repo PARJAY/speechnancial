@@ -1,7 +1,5 @@
 package com.example.speechnancial.tools
 
-import android.util.Log
-
 fun main() {
     val nominals = sequenceOf(
         "rp100 miliar 100 juta 100.000,001",

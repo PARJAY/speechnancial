@@ -49,8 +49,9 @@ fun createTransactionFromInput(
         rawText = userRawInput,
         type = transactionType,
         details = details,
+        total = details.sumOf { it.nominal.toInt() }.toFloat(),
         createdAt = LocalDateTime.now(),
-        isNeedRevise = details.any { !it.emptyChecker() },
+        isReviseNeeded = details.any { !it.emptyChecker() },
         isValid = transactionType != TransactionType.UNDEFINED && details.all { it.emptyChecker() }
     )
 }
@@ -82,7 +83,7 @@ fun createTransactionFromInputWithDebug(userRawInput: String, transaction : Muta
         type = transactionType,
         details = details,
         createdAt = LocalDateTime.now(),
-        isNeedRevise = details.any { !it.emptyChecker() },
+        isReviseNeeded = details.any { !it.emptyChecker() },
         isValid = transactionType != TransactionType.UNDEFINED && details.all { it.emptyChecker() }
     )
 
