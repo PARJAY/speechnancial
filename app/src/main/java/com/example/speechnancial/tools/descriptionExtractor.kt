@@ -1,18 +1,61 @@
 package com.example.speechnancial.tools
 
 fun main() {
-    val text =
-        "Beli ESP 32 rp100 miliar 100 juta 100.000,000 dht rp 25.000 kabel jumper rp. 45.000.000.000.000 breadboard 400 poin rp dua puluh delapan ribu" +
-        "cuci uang korupsi bambang tambang timah rp 12 miliar 11 juta 19.111 cuci uang korupsi bambang tambang timah 12 miliar 11 juta 19.111 rupiah"
+    val textTestCase1 =
+        "Beli ESP 32 rp100 miliar 100 juta 100.000,000 " +
+        "dht rp 25.000 " +
+        "kabel jumper rp. 45.000.000.000.000 "
 
-    val nominals = sequenceOf(
+    val nominalsTestCase1 = sequenceOf(
         "rp100 miliar 100 juta 100.000,000",
         "rp 25.000",
         "rp. 45.000.000.000.000",
-        "rp 12 miliar 11 juta 19.111",
-        "12 miliar 11 juta 19.111 rupiah"
     )
-    descriptionExtractor(text, nominals)
+
+    /* test case 1 expected result :
+    // MutableList<Pair<String, String>> of
+    // [
+    //      (Beli ESP 32, rp100 miliar 100 juta 100.000,000 ),
+    //      (dht, rp 25.000),
+    //      (kabel jumper, rp. 45.000.000.000.000 )
+    // ]
+    */
+
+    val textTestCase2 = "Bayar parkir 2000 rupiah Bayar parkir 2000 rupiah"
+
+    val nominalsTestCase2 = sequenceOf(
+        "2000 rupiah",
+        "2000 rupiah",
+    )
+
+    val textTestCase3 = "Beng-beng Kantin Sekolah kampus Unud 2 buah rp5.000"
+    val nominalsTestCase3 = sequenceOf(
+        "rp5.000"
+    )
+
+    val textTestCase4 = "Belanja telur satu kerat 48.000 tuna 1/4 kilo 1513.000 dan tahu tempe Rp5.000"
+    val nominalsTestCase4 = sequenceOf(
+        "Rp5.000"
+    )
+
+    val text = "Ivan ngembaliin rp50.000 jadi hutangnya udah lunas"
+    val nominals = sequenceOf("rp50.000")
+
+    val result = descriptionExtractorNew(text, nominals)
+    println(result)
+
+    /* test case 2 expected result :
+    // MutableList<Pair<String, String>> of
+    // [
+    //      (Bayar parkir, 2000 rupiah),
+    //      (Bayar parkir, 2000 rupiah),
+    // ]
+    */
+
+    println(descriptionExtractorNew(textTestCase1, nominalsTestCase1))
+    println(descriptionExtractorNew(textTestCase2, nominalsTestCase2))
+    println(descriptionExtractorNew(textTestCase3, nominalsTestCase3))
+    println(descriptionExtractorNew(textTestCase4, nominalsTestCase4))
 }
 
 // todo :
@@ -20,6 +63,8 @@ fun main() {
 //  the string that hold nominal might null / empty
 //  suggestion change type to mutableListOf<Pair<String, String?>>()
 fun descriptionExtractor(text: String, nominals: Sequence<String>) : MutableList<Pair<String, String>> {
+    // simpan text
+
     val processedNominals = mutableListOf<String>()
     val transactions = mutableListOf<Pair<String, String>>()
 
@@ -36,6 +81,8 @@ fun descriptionExtractor(text: String, nominals: Sequence<String>) : MutableList
 
         transactions.add(description to nominal)
         processedNominals.add(nominal) // Track this nominal
+
+        // hapus bagian text yang terdeteksi transaksi sebelumnya
     }
 
     return transactions
@@ -85,4 +132,60 @@ fun descriptionExtractorStepByStep(text: String, nominals: Sequence<String>) {
     }
 
 //    return transactions
+}
+
+fun descriptionExtractorNew(text: String, nominals: Sequence<String>): MutableList<Pair<String, String>> {
+    var remainingText = text
+    val transactions = mutableListOf<Pair<String, String>>()
+
+    for (nominal in nominals) {
+        val startIdx = remainingText.indexOf(nominal)
+
+        if (startIdx == -1) continue
+
+        val description = remainingText.substring(0, startIdx).trim()
+
+        transactions.add(description to nominal)
+        remainingText = remainingText.substring(startIdx + nominal.length).trim()
+    }
+
+    // Add the remaining text with a "0" nominal
+    if (remainingText.isNotEmpty()) {
+        transactions.add(remainingText to "0")
+    }
+
+    return transactions
+}
+
+fun descriptionExtractorWithDebug(text: String, nominals: Sequence<String>): MutableList<Pair<String, String>> {
+    var remainingText = text
+    val transactions = mutableListOf<Pair<String, String>>()
+
+    println("Initial text: \"$text\"")
+    println("Nominals: ${nominals.joinToString()}")
+
+    for (nominal in nominals) {
+        println("\nProcessing nominal: \"$nominal\"")
+        val startIdx = remainingText.indexOf(nominal)
+
+        if (startIdx == -1) {
+            println("Nominal \"$nominal\" not found in remaining text: \"$remainingText\"")
+            continue
+        }
+
+        // Deskripsi adalah teks sebelum nominal
+        val description = remainingText.substring(0, startIdx).trim()
+        println("Description: \"$description\"")
+
+        // Tambahkan pasangan deskripsi dan nominal ke daftar
+        transactions.add(description to nominal)
+        println("Added pair: ($description, $nominal)")
+
+        // Potong teks yang telah diproses, mulai dari akhir nominal saat ini
+        remainingText = remainingText.substring(startIdx + nominal.length).trim()
+        println("Remaining text after processing: \"$remainingText\"")
+    }
+
+    println("\nFinal transactions: $transactions")
+    return transactions
 }

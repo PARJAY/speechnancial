@@ -1,68 +1,46 @@
 package com.example.speechnancial.viewmodel.transactionListScreen
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.speechnancial.data.dao.TransactionDao
-import com.example.speechnancial.data.model.Transaction
-import com.example.speechnancial.tools.createTransactionFromInput
+import com.example.speechnancial.data.datastore.WalletDataStoreManager
+import com.example.speechnancial.data.model.WalletBalanceAndHistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.update
 
-class TransactionListViewModel(private val transactionDao: TransactionDao) : ViewModel() {
-
-    private val _transaction = transactionDao.getAllTransactions().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+class TransactionListViewModel(
+    transactionDao: TransactionDao,
+    dataStoreManager: WalletDataStoreManager
+) : ViewModel() {
+    private val _transaction = transactionDao.getAllSortedTransactions().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     private val _state = MutableStateFlow(TransactionListState())
 
-    val state = combine(_state, _transaction) { state, transaction ->
+    private val _walletData = combine(
+        dataStoreManager.getWalletBalance(),
+        dataStoreManager.getTotalSpending(),
+        dataStoreManager.getTotalEarning()
+    ) { balance, totalSpending, totalEarnings ->
+        WalletBalanceAndHistory(balance, totalSpending, totalEarnings)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = WalletBalanceAndHistory()
+    )
+
+    val state: StateFlow<TransactionListState> = combine(_state, _transaction, _walletData) { state, transaction, walletData ->
         state.copy(
-            transactionList = transaction
+            transactionList = transaction,
+            walletBalanceAndHistory = walletData
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), TransactionListState())
 
     fun onEvent(event : TransactionListEvent) {
         when(event) {
-            is TransactionListEvent.TransactionItemOnClickShowDialog -> {
-                _state.update { it.copy(
-                    selectedTransaction = event.transaction,
-                    showUpdateTransactionDialog = true
-                ) }
-            }
-
-            is TransactionListEvent.HandleUserInput -> {
-                _state.update {
-                    it.copy(
-                        selectedTransaction = it.selectedTransaction.copy(rawText = event.userInput)
-                    )
-                }
-            }
-
-            TransactionListEvent.DialogActionDeleteTransaction -> {
-                viewModelScope.launch { transactionDao.deleteTransaction(state.value.selectedTransaction) }
-            }
-
-            TransactionListEvent.DialogActionUpdateSelectedTransaction -> {
-                viewModelScope.launch {
-                    _state.update {
-                        it.copy(
-                            selectedTransaction =
-                            createTransactionFromInput(state.value.selectedTransaction.rawText)
-                        )
-                    }
-                    transactionDao.updateTransaction(state.value.selectedTransaction)
-                }
-            }
-
-            TransactionListEvent.HideDialog -> {
-                _state.update { it.copy(
-                    selectedTransaction = Transaction(),
-                    showUpdateTransactionDialog = false
-                ) }
-            }
-
             TransactionListEvent.FilterEarningButtonClick -> {
                 _state.update { it.copy(
                     isFilterEarningActive = !state.value.isFilterEarningActive
@@ -75,8 +53,8 @@ class TransactionListViewModel(private val transactionDao: TransactionDao) : Vie
                 ) }
             }
 
-            TransactionListEvent.SettingButtonClick -> {
-                TODO("showToast")
+            is TransactionListEvent.SettingButtonClick -> {
+                Toast.makeText(event.context, "not yet implemented", Toast.LENGTH_SHORT).show()
             }
         }
     }

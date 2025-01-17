@@ -20,12 +20,7 @@ data class Transaction(
     val isReviseNeeded: Boolean = false,
     val isTranscriptionError: Boolean = false,
     val isValid: Boolean = true
-) : Parcelable {
-    fun validator(): Boolean {
-        if (type == TransactionType.UNDEFINED) return false
-        return details?.all { it.emptyChecker() } ?: false
-    }
-}
+) : Parcelable
 
 @Parcelize
 data class TransactionDetail(

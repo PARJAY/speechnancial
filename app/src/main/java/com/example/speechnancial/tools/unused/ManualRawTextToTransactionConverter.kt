@@ -106,8 +106,8 @@ fun main() {
 // Identifikasi tipe transaksi
 fun identifyTransactionType(description: String): TransactionType {
     return when {
-        pemasukanKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionType.INCOME
-        pengeluaranKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionType.OUTCOME
+        pemasukanKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionType.EARNING
+        pengeluaranKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionType.SPENDING
         else -> TransactionType.UNDEFINED
     }
 }

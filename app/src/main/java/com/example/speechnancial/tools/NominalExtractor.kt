@@ -1,6 +1,16 @@
 package com.example.speechnancial.tools
 
-fun nominalExtractor(userRawInput : String) : Sequence<String> {
+fun main() {
+    nominalExtractorRegex("Belanja telur satu kerat 48.000 tuna 1/4 kilo 1513.000 dan tahu tempe Rp5.000").forEach {
+        println(it)
+    }
+
+    nominalExtractorRegex("Belanja telur satu kerat 48.000 tuna 1/4 kilo 1513.000 dan tahu tempe Rp 5.000").forEach {
+        println(it)
+    }
+}
+
+fun nominalExtractorRegex(userRawInput : String) : Sequence<String> {
     val daftarDigitDalamKata = listOf("puluh","ratus","ribu","juta","miliar","triliun")
     val daftarDigitDalamKataRegex = daftarDigitDalamKata.joinToString("|")
 
@@ -8,10 +18,13 @@ fun nominalExtractor(userRawInput : String) : Sequence<String> {
     // 123 [digit kata] [nominal] rupiah
 
     /*
-    // nominalNumber simplified :
-    // any digit without . or ,                     ex : rp122222221121
-    // 1-3 digit with "." and 1-3 looping           ex : rp.789.123
-    // 1-3 digit with "," followed by any digit     ex : rp.789.123,456789012312389123
+    // regex simplified :
+    // ide pertama adalah angka dan kata digit sampek selesai
+        // contoh : 123 juta 23 ribu
+    // ide kedua adalah angka dengan titik dan koma
+        // contoh : 123.456.789.000,1234567890
+    // ide ketiga adalah angka tok
+        // contoh : 1234567890
     * */
 
     // user ngomong -> specech recognition -> regex -> transaksi sah
@@ -29,8 +42,8 @@ fun nominalExtractor(userRawInput : String) : Sequence<String> {
 
     val regex =
         (
-            "rp.?\\s?\\d{1,3}" + rule +
-            "|" + rule + "\\srupiah"
+            "(rp|Rp|RP).?\\s?\\d{1,3}" + rule +
+            "|\\d{1,3}" + rule + "\\s(rupiah|Rupiah)"
         ).toRegex()
     val matches = regex.findAll(userRawInput)
 

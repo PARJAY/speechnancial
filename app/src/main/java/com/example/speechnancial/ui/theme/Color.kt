@@ -18,7 +18,7 @@ val backgroundContainerDarkTheme = Color(0xFF101010)
 val incomeBackgroundDarkTheme = Color(0xFF269F37)
 val outcomeBackgroundDarkTheme = Color(0xFFE03838)
 val primaryContentDarkTheme = Color(0xFFFFFFFF)
-val secondaryContentDarkTheme = Color(0xFFCCCCCC)
+val secondaryContentDarkTheme = Color(0xFFAAAAAA)
 
 // app color
 val appColorPrimary = Color(0xff009BED)

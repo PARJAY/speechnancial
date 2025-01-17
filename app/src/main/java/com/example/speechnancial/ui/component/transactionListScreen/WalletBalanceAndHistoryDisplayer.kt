@@ -2,6 +2,7 @@ package com.example.speechnancial.ui.component.transactionListScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.speechnancial.R
 import com.example.speechnancial.viewmodel.transactionListScreen.WalletQuickHistory
 import com.example.speechnancial.data.model.WalletBalanceAndHistory
+import com.example.speechnancial.tools.formatToThousandsSeparator
 import com.example.speechnancial.ui.preview.BallanceInAndOutDisplayerParameterProvider
 import com.example.speechnancial.ui.theme.SpeechnancialTheme
 import com.example.speechnancial.ui.theme.transpernt
@@ -64,13 +66,14 @@ fun WalletBalanceAndHistoryDisplayer(
                 fontSize = 16.sp
             )
             Icon(
+                modifier = Modifier.clickable { /* TODO on event setting click VM */ },
                 painter = painterResource(R.drawable.ic_settings),
                 tint = MaterialTheme.colorScheme.secondary,
                 contentDescription = "app setting"
             )
         }
         Text(
-            "Rp. ${walletBalanceAndHistory.currentBalance}",
+            "Rp. ${formatToThousandsSeparator(walletBalanceAndHistory.currentBalance)}",
             modifier = Modifier.fillMaxWidth(1f),
             color = MaterialTheme.colorScheme.primary,
             textAlign = TextAlign.Center,
@@ -85,7 +88,7 @@ fun WalletBalanceAndHistoryDisplayer(
                 onClick = { onFilterEarningClick() },
                 backgroundColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 transactionType = isIncomeActive,
-                nominal = "+ Rp. ${walletBalanceAndHistory.totalEarnings}"
+                nominal = "+ Rp. ${formatToThousandsSeparator(walletBalanceAndHistory.totalEarnings)}"
             )
 
             TransactionTypeSummaryButton(
@@ -93,7 +96,7 @@ fun WalletBalanceAndHistoryDisplayer(
                 onClick = { onFilterSpendingClick() },
                 backgroundColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 transactionType = isOutcomeActive,
-                nominal = "- Rp. ${walletBalanceAndHistory.totalSpending}"
+                nominal = "- Rp. ${formatToThousandsSeparator(walletBalanceAndHistory.totalSpending)}"
             )
         }
     }

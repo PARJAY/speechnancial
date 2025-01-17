@@ -12,6 +12,6 @@ class MyApp: Application() {
     override fun onCreate() {
         super.onCreate()
         appModule = AppModuleImpl(this, this)
-
     }
+
 }

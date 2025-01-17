@@ -11,9 +11,3 @@ data class TransactionListState(
     val selectedTransaction: Transaction = Transaction(),
     val showUpdateTransactionDialog: Boolean = false,
 )
-
-// needed for preview | todo => move this file to better folder placement
-data class TransactionItemState(
-    val transaction: Transaction = Transaction(),
-    val isExpanded: Boolean = false
-)

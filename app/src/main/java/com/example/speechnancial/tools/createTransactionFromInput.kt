@@ -6,7 +6,7 @@ import com.example.speechnancial.common.TransactionType
 import com.example.speechnancial.data.model.Transaction
 import com.example.speechnancial.data.model.TransactionDetail
 import java.time.LocalDateTime
-import java.util.Date
+import kotlin.math.log
 
 fun main() {
     val text =
@@ -23,13 +23,50 @@ fun main() {
         println(transactionDetail.nominal)
         println()
     }
+
+
+    val userInputTestCase1 = "Beli sabun 5000 rupiah sampo 15000 rupiah deterjen 20000 rupiah"
+
+    val userInputTestCase2 = "Beli sabun 5000 rupiah sampo pantene 25000 rupiah deterjen 20000 rupiah"
+    val previousTransactionTestCase2 = Transaction(
+        details = listOf(
+            TransactionDetail("Beli sabun ", 5000f),
+            TransactionDetail("sampo ", 15000f),
+            TransactionDetail("deterjen ", 20000f),
+        )
+    )
+
+    createTransactionFromInput(userInputTestCase1).details?.forEach { transactionDetail ->
+        println(transactionDetail.description)
+        println(transactionDetail.nominal)
+        println()
+    }
+
+    createTransactionFromInput(
+        userInputTestCase2,
+        0
+    ).details?.forEach { transactionDetail ->
+        println(transactionDetail.description)
+        println(transactionDetail.nominal)
+        println()
+    }
 }
 
+// todo : check what different before performing regex Regex denial of Service
+//  compare user raw input with previousTransaction to see where is the edit happened
+//  the only way we know is
+//  and lastly, only do and apply the change to the edited
+//  a
+//  val friendlyToEditRawText = details.joinToString(separator = " ") { detail ->
+//     "${detail.description} ${detail.nominal.toInt()} rupiah"
+//  }
+
 fun createTransactionFromInput(
-    userRawInput: String
+    userRawInput: String,
+    previousTransactionId: Int = 0
 ) : Transaction {
-    val extractedNominalList = nominalExtractor(userRawInput).toList()
-    val extractedDescriptionList = descriptionExtractor(userRawInput, extractedNominalList.asSequence())
+    val extractedNominalList : List<String> = nominalExtractorRegex(userRawInput).toList()
+    val extractedDescriptionList: MutableList<Pair<String, String>> = descriptionExtractorNew(userRawInput, extractedNominalList.asSequence())
 
     val details = extractedDescriptionList.map { (description, nominal) ->
         TransactionDetail(
@@ -39,14 +76,21 @@ fun createTransactionFromInput(
     }
 
     var transactionType: TransactionType = TransactionType.UNDEFINED
-    val firstDetail = extractedDescriptionList.firstOrNull()
+    val firstDetail : Pair<String, String>? = extractedDescriptionList.firstOrNull()
     if (firstDetail != null) {
         val (description) = firstDetail
         transactionType = findTransactionType(description.split(" ")[0].lowercase())
     }
 
+    val friendlyToEditRawText = details.joinToString(separator = " ") { detail ->
+        "${detail.description} ${detail.nominal.toInt()} rupiah"
+    }.ifEmpty { userRawInput }
+
+//    Log.d("friendlyToEditRawText", friendlyToEditRawText)
+
     return Transaction(
-        rawText = userRawInput,
+        id = previousTransactionId,
+        rawText = friendlyToEditRawText,
         type = transactionType,
         details = details,
         total = details.sumOf { it.nominal.toInt() }.toFloat(),
@@ -57,7 +101,7 @@ fun createTransactionFromInput(
 }
 
 fun createTransactionFromInputWithDebug(userRawInput: String, transaction : MutableState<Transaction>): Transaction {
-    val extractedNominalList = nominalExtractor(userRawInput).toList()
+    val extractedNominalList = nominalExtractorRegex(userRawInput).toList()
     val extractedDescriptionList = descriptionExtractor(userRawInput, extractedNominalList.asSequence())
 
     extractedNominalList.forEach {
@@ -78,7 +122,7 @@ fun createTransactionFromInputWithDebug(userRawInput: String, transaction : Muta
         transactionType = findTransactionType(description.split(" ")[0].lowercase())
     }
 
-    val transaction = Transaction(
+    return  Transaction(
         rawText = userRawInput,
         type = transactionType,
         details = details,
@@ -86,6 +130,4 @@ fun createTransactionFromInputWithDebug(userRawInput: String, transaction : Muta
         isReviseNeeded = details.any { !it.emptyChecker() },
         isValid = transactionType != TransactionType.UNDEFINED && details.all { it.emptyChecker() }
     )
-
-    return transaction
 }

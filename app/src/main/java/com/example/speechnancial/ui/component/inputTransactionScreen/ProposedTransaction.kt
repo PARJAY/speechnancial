@@ -1,9 +1,6 @@
 package com.example.speechnancial.ui.component.inputTransactionScreen
 
-import android.content.res.Configuration
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,31 +9,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.speechnancial.common.TransactionType
 import com.example.speechnancial.data.model.Transaction
-import com.example.speechnancial.ui.preview.TransactionItemPreviewParameterProvider
+import com.example.speechnancial.tools.formatToThousandsSeparator
+import com.example.speechnancial.ui.preview.InputTransactionStatePreviewParameterProvider
 import com.example.speechnancial.ui.theme.SpeechnancialTheme
-import com.example.speechnancial.ui.theme.transpernt
-import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
+import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
+import java.text.DecimalFormat
 
 @Composable
 fun ProposedTransaction(
@@ -45,6 +37,7 @@ fun ProposedTransaction(
 
     onConfirmButtonClick: () -> Unit,
     onDeleteButtonClick: () -> Unit,
+    onUpdateButtonClick: () -> Unit,
 
     isReviseNeeded: Boolean,
     onReviseNeededClick: () -> Unit,
@@ -68,13 +61,16 @@ fun ProposedTransaction(
     ) {
         // avoiding gap content
         Column {
+            Text(
+                "id transaksi : ${transaction.id}"
+            )
             transaction.details?.forEach {
                 Row {
                     Text(
                         it.description,
                         modifier = Modifier.weight(1f)
                     )
-                    Text("Rp. ${it.nominal}")
+                    Text("Rp${formatToThousandsSeparator(it.nominal)}")
                 }
             }
         }
@@ -87,11 +83,11 @@ fun ProposedTransaction(
         )
 
         Text(
-            "Rp${transaction.total}",
+            "Rp.${formatToThousandsSeparator(transaction.total)}",
             color =
             when (transaction.type) {
-                TransactionType.INCOME -> MaterialTheme.colorScheme.tertiaryContainer
-                TransactionType.OUTCOME -> MaterialTheme.colorScheme.onTertiaryContainer
+                TransactionType.EARNING -> MaterialTheme.colorScheme.tertiaryContainer
+                TransactionType.SPENDING -> MaterialTheme.colorScheme.onTertiaryContainer
                 else -> MaterialTheme.colorScheme.primary
             },
             fontSize = 18.sp,
@@ -118,116 +114,55 @@ fun ProposedTransaction(
             )
         }
 
-        Row {
+        Row (Modifier.fillMaxWidth()) {
             if(isEditExistingTransaction) {
                 CompactButton(
                     onClick = { onDeleteButtonClick() },
-                    text = "Hapus"
+                    text = "Hapus",
+                    Modifier.weight(1f),
+                    MaterialTheme.colorScheme.onSecondaryContainer
                 )
 
-                Spacer(Modifier.padding(16.dp))
+                Spacer(Modifier.padding(4.dp))
+
+                CompactButton(
+                    onClick = { onUpdateButtonClick() },
+                    text = "Perbarui",
+                    Modifier.weight(1f),
+                    MaterialTheme.colorScheme.tertiary
+                )
+            }
+            else {
+                CompactButton(
+                    onClick = { onConfirmButtonClick() },
+                    text = "Simpan",
+                    Modifier.weight(1f),
+                    MaterialTheme.colorScheme.tertiary
+                )
             }
 
-            CompactButton(
-                onClick = { onConfirmButtonClick() },
-                text = "Simpan"
-            )
-
         }
     }
 }
 
-@Composable
-fun CompactButton(onClick: () -> Unit, text: String) {
-    Button(
-        onClick = { onClick() },
-        Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        colors = ButtonColors(
-            containerColor = MaterialTheme.colorScheme.tertiary,
-            contentColor = MaterialTheme.colorScheme.primary,
-            disabledContentColor = transpernt,
-            disabledContainerColor = transpernt
-        ),
 
-        ) {
-
-        Text(
-            text,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-        )
-    }
-}
-
-@Composable
-fun CompactCheckbox(
-    isChecked: Boolean,
-    onCheckedChange: () -> Unit,
-    text: String
-) {
-    Checkbox(
-        checked = isChecked,
-        onCheckedChange = {
-            onCheckedChange()
-        },
-        colors = CheckboxDefaults.colors(
-            checkedColor = MaterialTheme.colorScheme.onTertiary,
-            checkmarkColor = Color.White
-        ),
-
-        //below line is uses an interaction source
-        // that handles interaction events for the checkbox
-        interactionSource = remember { MutableInteractionSource() }
-    )
-    Text(text)
-}
-
-// todo : dirty and duplicate code, revise later
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@PreviewLightDark
 @Composable
 fun ProposedTransactionPreview(
-    @PreviewParameter(TransactionItemPreviewParameterProvider::class) state : TransactionItemState
+    @PreviewParameter(InputTransactionStatePreviewParameterProvider::class) state: InputTransactionState
 ) {
     SpeechnancialTheme {
         Surface {
             ProposedTransaction(
-                transaction = state.transaction,
-                isEditExistingTransaction = true,
-
-                onConfirmButtonClick = {},
-                onDeleteButtonClick = {},
-
-                isReviseNeeded = true,
-                onReviseNeededClick = {},
-                isTransacribtionError = false,
-                onTransacribtionErrorClick = {},
-            )
-        }
-    }
-}
-
-// todo : dirty and duplicate code, revise later
-@Preview(showBackground = true)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
-@Composable
-fun ProposedTransactionPreview2(
-    @PreviewParameter(TransactionItemPreviewParameterProvider::class) state : TransactionItemState
-) {
-    SpeechnancialTheme {
-        Surface {
-            ProposedTransaction(
-                transaction = state.transaction,
-                isEditExistingTransaction = false,
-
-                onConfirmButtonClick = {},
-                onDeleteButtonClick = {},
-
-                isReviseNeeded = false,
-                onReviseNeededClick = {},
-                isTransacribtionError = true,
-                onTransacribtionErrorClick = {},
+                transaction = state.proposedTransaction,
+                isEditExistingTransaction = state.isEditExistingTransaction,
+                onConfirmButtonClick = { },
+                onDeleteButtonClick = { },
+                onUpdateButtonClick = { },
+                isReviseNeeded = state.isReviseNeeded,
+                onReviseNeededClick = { },
+                isTransacribtionError = state.isTranscriptionError,
+                onTransacribtionErrorClick = { },
             )
         }
     }

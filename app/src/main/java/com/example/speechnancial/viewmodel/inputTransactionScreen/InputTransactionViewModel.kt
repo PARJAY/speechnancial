@@ -7,12 +7,12 @@ import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.speechnancial.common.TransactionType
 import com.example.speechnancial.data.dao.TransactionDao
-import com.example.speechnancial.data.model.Transaction
+import com.example.speechnancial.data.datastore.WalletDataStoreManager
 import com.example.speechnancial.tools.createTransactionFromInput
 import com.example.speechnancial.tools.startSpeechToText
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,7 +20,8 @@ import java.util.Locale
 
 class InputTransactionViewModel(
     private val transactionDao: TransactionDao,
-    context: Context
+    context: Context,
+    private val dataStoreManager: WalletDataStoreManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(InputTransactionState())
@@ -38,22 +39,51 @@ class InputTransactionViewModel(
         }
     )
 
+    private suspend fun updateTotalIncome(amount: Float) {
+        manipulateDataStore(
+            action = { dataStoreManager.newIncomeInputed(amount) },
+            errorMessage = "Error updating datastore income"
+        )
+    }
+
+    private suspend fun updateTotalExpense(amount: Float) {
+        manipulateDataStore(
+            action = { dataStoreManager.newExpenseInputed(amount) },
+            errorMessage = "Error updating datastore expense"
+        )
+    }
+
+    private suspend fun setTotalOutcome(amount: Float) {
+        manipulateDataStore(
+            action = { dataStoreManager.setTotalOutcomeAndUpdateBalance(amount) },
+            errorMessage = "Error updating setting Total Outcome"
+        )
+    }
+
+    private suspend fun setTotalIncome(amount: Float) {
+        manipulateDataStore(
+            action = { dataStoreManager.setTotalIncomeAndUpdateBalance(amount) },
+            errorMessage = "Error updating setting Total Income"
+        )
+    }
+
     fun onEvent(event : InputTransactionEvent) {
         when(event) {
             is InputTransactionEvent.IsEditExistingTransactionData -> {
                 _state.update { it.copy(
                     proposedTransaction = event.transaction,
+                    source = event.transaction.details?.joinToString(separator = "\n") { detail ->
+                        "${detail.description} ${detail.nominal.toInt()} rupiah"
+                    }?.ifEmpty { event.transaction.rawText }.toString(),
                     isEditExistingTransaction = true
                 ) }
             }
 
-            is InputTransactionEvent.IsCloseScreen ->
-                _state.update { it.copy(
-                    isEditExistingTransaction = false
-                ) }
+            is InputTransactionEvent.IsCloseScreen -> _state.update {
+                InputTransactionState()
+            }
 
             is InputTransactionEvent.SpeechToTransactionButtonClicked -> {
-                // todo : unchecked
                 _state.update { currentState ->
                     if (!currentState.isTranscribing) {
                         currentState.copy(
@@ -67,8 +97,6 @@ class InputTransactionViewModel(
                         )
                     }
                 }
-
-                Log.d("InputTransactionVMV : ", "state change")
 
                 if (_state.value.isTranscribing) {
                     startSpeechToText(
@@ -93,8 +121,14 @@ class InputTransactionViewModel(
                     _speechRecognizer.value.destroy()
 
                     _state.update { it.copy(
+                        source = it.source + it.previousPartialResult,
+                        previousPartialResult = ""
+                    ) }
+
+                    _state.update { it.copy(
                         proposedTransaction = createTransactionFromInput(
-                            (it.source + it.previousPartialResult).lowercase()
+                            it.source.lowercase(),
+                            state.value.proposedTransaction.id
                         )
                     )}
                 }
@@ -102,20 +136,27 @@ class InputTransactionViewModel(
 
             is InputTransactionEvent.HandleUserInput -> {
                 _state.update { it.copy(
-                    source = event.userInput
+                    source = event.userInput,
+                    previousPartialResult = ""
                 ) }
-            }
-            InputTransactionEvent.ResetButtonClicked -> {
+
                 _state.update { it.copy(
-                    source = ""
-                ) }
+                    proposedTransaction = createTransactionFromInput(
+                        it.source.lowercase(),
+                        state.value.proposedTransaction.id
+                    )
+                )}
             }
+
+            InputTransactionEvent.ResetButtonClicked ->
+                _state.update { InputTransactionState() }
 
             InputTransactionEvent.ReviseLaterCheckboxClicked -> {
                 _state.update { it.copy(
                     isReviseNeeded = !it.isReviseNeeded
                 ) }
             }
+
             InputTransactionEvent.TranscriptionErrorCheckboxClicked -> {
                 _state.update { it.copy(
                     isTranscriptionError = !it.isTranscriptionError
@@ -125,55 +166,45 @@ class InputTransactionViewModel(
             is InputTransactionEvent.SaveTransaction -> {
                 viewModelScope.launch {
                     transactionDao.insertTransaction(state.value.proposedTransaction)
+                    if (state.value.proposedTransaction.type == TransactionType.SPENDING) {
+                        updateTotalExpense(state.value.proposedTransaction.total)
+                    }
+                    if (state.value.proposedTransaction.type == TransactionType.EARNING) {
+                        updateTotalIncome(state.value.proposedTransaction.total)
+                    }
+
+                    _state.update { InputTransactionState() }
                 }
             }
+
             InputTransactionEvent.UpdateTransaction -> {
                 viewModelScope.launch {
                     transactionDao.updateTransaction(state.value.proposedTransaction)
+                    if (state.value.proposedTransaction.type == TransactionType.SPENDING) {
+                        setTotalOutcome(transactionDao.getTotalSpending())
+                    }
+                    if (state.value.proposedTransaction.type == TransactionType.EARNING) {
+                        setTotalIncome(transactionDao.getTotalEarning())
+                    }
                 }
 
-                _state.update { it.copy(
-                    isEditExistingTransaction = false
-                ) }
+                _state.update { InputTransactionState() }
             }
+
             InputTransactionEvent.DeleteTransaction -> {
                 viewModelScope.launch {
                     transactionDao.deleteTransaction(state.value.proposedTransaction)
+                    updateTotalExpense(-state.value.proposedTransaction.total)
                 }
             }
         }
     }
 }
 
-
-
-
-//if (!state.isTranscribing.value) {
-//    state.isTranscribing.value = true
-//    state.isFinishedTranscribing.value = false
-//    startSpeechToText(
-//        state.context,
-//        state.speechRecognizer.value,
-//        state.speechRecognizerIntent.value,
-//        onPartialResults = {
-//            if (state.previousPartialResult.value.isNotEmpty() && it.isEmpty()) {
-//                state.source.value += state.previousPartialResult.value
-////                    Log.d("source", state.source.value)
-//            }
-//
-//            state.previousPartialResult.value = it
-////                Log.d("previousPartialResult", it)
-//        }
-//    )
-//    state.speechRecognizer.value.startListening(state.speechRecognizerIntent.value)
-//} else {
-//    state.isTranscribing.value = false
-//    state.isFinishedTranscribing.value = true
-//    state.speechRecognizer.value.stopListening()
-//    state.speechRecognizer.value.destroy()
-//
-//    createTransactionFromInput(
-//        (state.source.value + state.previousPartialResult.value).lowercase(),
-//        state.transaction
-//    )
-//}
+private suspend fun manipulateDataStore(action: suspend () -> Unit, errorMessage: String) {
+    try {
+        action()
+    } catch (e: Exception) {
+        Log.e("WalletViewModel", errorMessage, e)
+    }
+}

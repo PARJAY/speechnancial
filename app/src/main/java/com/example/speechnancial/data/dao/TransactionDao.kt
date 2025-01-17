@@ -6,8 +6,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.speechnancial.common.TransactionType
 import com.example.speechnancial.data.model.Transaction
-import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
+import com.example.speechnancial.data.model.WalletBalanceAndHistory
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,4 +27,10 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions ORDER BY createdAt DESC")
     fun getAllSortedTransactions(): Flow<List<Transaction>>
+
+    @Query("""SELECT COALESCE(SUM(total), 0) FROM transactions WHERE type = 'SPENDING' """)
+    suspend fun getTotalSpending(): Float
+
+    @Query("""SELECT COALESCE(SUM(total), 0) FROM transactions WHERE type = 'EARNING' """)
+    suspend fun getTotalEarning(): Float
 }

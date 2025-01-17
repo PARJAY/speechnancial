@@ -32,7 +32,7 @@ fun main() {
 
 fun removeRp(nominal: String): String {
     val trimmedNominal = nominal.trim()
-    return trimmedNominal.replace(Regex("(\\s*rp\\.?\\s*|\\s*rupiah\\s*)"), "")
+    return trimmedNominal.replace(Regex("(\\s*(rp|Rp|RP)\\.?\\s*|\\s*rupiah\\s*)"), "")
 }
 
 fun parseNominalToFloat(nominalString: String): Float {

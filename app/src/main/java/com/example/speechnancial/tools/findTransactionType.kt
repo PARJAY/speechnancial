@@ -9,11 +9,11 @@ import com.example.speechnancial.common.pengeluaranKeywords
 fun findTransactionType(word: String): TransactionType {
     for (kataKunciPengeluaran in pengeluaranKeywords)
         if (boyerMooreHorspoolSearch(word, kataKunciPengeluaran) != -1)
-            return TransactionType.OUTCOME
+            return TransactionType.SPENDING
 
     for (kataKunciPemasukan in pemasukanKeywords)
         if (boyerMooreHorspoolSearch(word, kataKunciPemasukan) != -1)
-            return TransactionType.INCOME
+            return TransactionType.EARNING
 
     return TransactionType.UNDEFINED
 }
