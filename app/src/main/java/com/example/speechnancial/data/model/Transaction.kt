@@ -15,11 +15,13 @@ data class Transaction(
     val rawText: String = "",
     val type: TransactionType = TransactionType.UNDEFINED,
     val details: List<TransactionDetail>? = null,
-    val total : Float = 0f,
+    val total: Float = 0f,
     val createdAt: LocalDateTime? = null,
     val isReviseNeeded: Boolean = false,
     val isTranscriptionError: Boolean = false,
     val isValid: Boolean = true
+
+    // TODO : isFromSmartwatch
 ) : Parcelable
 
 @Parcelize

@@ -4,8 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     id("com.google.devtools.ksp")
     id("kotlin-parcelize")
-
-    //    id("org.jetbrains.kotlin.plugin.serialization")
+    alias(libs.plugins.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -95,4 +95,7 @@ dependencies {
 
     // DATA STORE
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+    implementation("com.google.firebase:firebase-analytics")
 }

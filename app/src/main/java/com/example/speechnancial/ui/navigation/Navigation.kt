@@ -3,6 +3,8 @@ package com.example.speechnancial.ui.navigation
 import android.Manifest
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -64,9 +66,8 @@ fun Navigation(innerPadding : PaddingValues) {
             )
 
             BackHandler {
-                inputTransactionVM.onEvent(InputTransactionEvent.IsCloseScreen)
+                inputTransactionVM.onEvent(InputTransactionEvent.IsCloseScreen(navController))
                 Log.d("InputTransactionScreen :" , "check ${state.isEditExistingTransaction}")
-                navController.navigateUp()
             }
         }
     }

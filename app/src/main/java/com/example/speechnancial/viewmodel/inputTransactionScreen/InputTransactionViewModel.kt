@@ -79,8 +79,11 @@ class InputTransactionViewModel(
                 ) }
             }
 
-            is InputTransactionEvent.IsCloseScreen -> _state.update {
-                InputTransactionState()
+            is InputTransactionEvent.IsCloseScreen -> {
+                _state.update {
+                    InputTransactionState()
+                }
+                event.navController.navigateUp()
             }
 
             is InputTransactionEvent.SpeechToTransactionButtonClicked -> {
@@ -148,7 +151,7 @@ class InputTransactionViewModel(
                 )}
             }
 
-            InputTransactionEvent.ResetButtonClicked ->
+            InputTransactionEvent.ResetInput ->
                 _state.update { InputTransactionState() }
 
             InputTransactionEvent.ReviseLaterCheckboxClicked -> {

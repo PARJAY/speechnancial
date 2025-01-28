@@ -30,20 +30,20 @@ fun nominalExtractorRegex(userRawInput : String) : Sequence<String> {
     // user ngomong -> specech recognition -> regex -> transaksi sah
     val rule =
         (
-            "(" +
-                "(" +
+            "(?:" +
+                "(?:" +
                     "\\s(${daftarDigitDalamKataRegex})" +
                     "(\\s\\d{1,3})?" +
                 ")+" +
-                "|(\\.?\\d{1,3})*(,\\d+)?" +
+                "|(?:\\.?\\d{1,3})*(,\\d+)?" +
                 "|\\d+" +
             ")*"
         ).toRegex()
 
     val regex =
         (
-            "(rp|Rp|RP).?\\s?\\d{1,3}" + rule +
-            "|\\d{1,3}" + rule + "\\s(rupiah|Rupiah)"
+            "(?:rp|Rp|RP).?\\s?\\d{1,3}" + rule +
+            "|\\d{1,3}" + rule + "\\s(?:rupiah|Rupiah)"
         ).toRegex()
     val matches = regex.findAll(userRawInput)
 

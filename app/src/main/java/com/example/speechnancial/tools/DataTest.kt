@@ -1,5 +1,8 @@
 package com.example.speechnancial.tools
 
+import com.example.speechnancial.tools.algoritma.working.boyerMooreSearchMultiplePatterns
+import com.example.speechnancial.tools.algoritma.working.nominalDescriptionSeparator
+
 fun main() {
     val testCaseData = listOf(
         "Gek sita ngebalikin uangku gara-gara beli polybag rp10.000",
@@ -136,20 +139,38 @@ fun main() {
     // todo : hitung berapa datanya, tes pake regex mu, buat confusion matrix dan TENTUIN True False Negative Positivenya sendiri
     //  kata ku sih 100% akurat 😎👊
 
-    testCaseData.forEachIndexed { index, it ->
-        val generatedTransaction = createTransactionFromInput(it)
-        println("test case index     : $index")
-        println("inputted text       : $it")
-        println("rawText             : ${generatedTransaction.rawText}")
-        println("type                : ${generatedTransaction.type}")
-        println("details             : ${generatedTransaction.details}")
-        println("total               : ${generatedTransaction.total}")
-        println("isValid             : ${generatedTransaction.isValid}")
-        println("T/F (System)        : T")
-        println("P/N (Reality)       : P")
-        println("___________________________________________________")
+    testCaseData.forEach {
+        val patterns = listOf("rp", "rupiah")
+
+        println("Text: \"$it\"")
+        println("Text Length: \"${it.length}\"")
+        println("Patterns: $patterns\n")
+
+        val occurrences = boyerMooreSearchMultiplePatterns(it, patterns)
+
+        println("occurrences : ${occurrences.keys.joinToString(", ")}")
+        println("nominal : ")
+        nominalDescriptionSeparator(it, occurrences)
+
+        println("_____________________________________________")
+        println("")
     }
-    println()
-    println()
-    println("testCaseData.size : ${testCaseData.size}")
+
+//    regex way
+//    testCaseData.forEachIndexed { index, it ->
+//        val generatedTransaction = createTransactionFromInput(it)
+//        println("test case index     : $index")
+//        println("inputted text       : $it")
+//        println("rawText             : ${generatedTransaction.rawText}")
+//        println("type                : ${generatedTransaction.type}")
+//        println("details             : ${generatedTransaction.details}")
+//        println("total               : ${generatedTransaction.total}")
+//        println("isValid             : ${generatedTransaction.isValid}")
+//        println("T/F (System)        : T")
+//        println("P/N (Reality)       : P")
+//        println("___________________________________________________")
+//    }
+//    println()
+//    println()
+//    println("testCaseData.size : ${testCaseData.size}")
 }
