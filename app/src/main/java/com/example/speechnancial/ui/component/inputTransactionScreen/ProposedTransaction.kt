@@ -22,13 +22,13 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
 import com.example.speechnancial.data.model.Transaction
+import com.example.speechnancial.newUi.component.sharedComponent.Title
 import com.example.speechnancial.tools.formatToThousandsSeparator
 import com.example.speechnancial.ui.preview.InputTransactionStatePreviewParameterProvider
 import com.example.speechnancial.ui.theme.SpeechnancialTheme
 import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
-import java.text.DecimalFormat
 
 @Composable
 fun ProposedTransaction(
@@ -59,18 +59,21 @@ fun ProposedTransaction(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        Title("Hasil Transaksi")
+
+        // row with 4 icon (wallet, category, date, revise later)
+
         // avoiding gap content
         Column {
-            Text(
-                "id transaksi : ${transaction.id}"
-            )
             transaction.details?.forEach {
                 Row {
                     Text(
-                        it.description,
+                        it.key,
                         modifier = Modifier.weight(1f)
                     )
-                    Text("Rp${formatToThousandsSeparator(it.nominal)}")
+                    Text("Rp${formatToThousandsSeparator(it.value)}")
+
+                    // plus icon in the end
                 }
             }
         }
@@ -86,8 +89,8 @@ fun ProposedTransaction(
             "Rp.${formatToThousandsSeparator(transaction.total)}",
             color =
             when (transaction.type) {
-                TransactionType.EARNING -> MaterialTheme.colorScheme.tertiaryContainer
-                TransactionType.SPENDING -> MaterialTheme.colorScheme.onTertiaryContainer
+                TransactionTypeOld.EARNING -> MaterialTheme.colorScheme.tertiaryContainer
+                TransactionTypeOld.SPENDING -> MaterialTheme.colorScheme.onTertiaryContainer
                 else -> MaterialTheme.colorScheme.primary
             },
             fontSize = 18.sp,
@@ -113,6 +116,8 @@ fun ProposedTransaction(
                 text = "Kesalahan Transkripsi"
             )
         }
+
+        // circle icon as many as transaction size that when clicked refer to transaction position and its data
 
         Row (Modifier.fillMaxWidth()) {
             if(isEditExistingTransaction) {

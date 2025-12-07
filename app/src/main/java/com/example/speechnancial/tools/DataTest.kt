@@ -1,7 +1,8 @@
 package com.example.speechnancial.tools
 
+import com.example.speechnancial.tools.algoritma.boyerMooreMultiplePatternsWithReturn
 import com.example.speechnancial.tools.algoritma.working.boyerMooreSearchMultiplePatterns
-import com.example.speechnancial.tools.algoritma.working.nominalDescriptionSeparator
+import com.example.speechnancial.tools.algoritma.working.inputtedTextToTransactionsConverter
 
 fun main() {
     val testCaseData = listOf(
@@ -134,23 +135,54 @@ fun main() {
         "Belanja sayur sup 2000",
         "Belanja telur satu kerat 48.000 tuna 1/4 kilo 1513.000 dan tahu tempe Rp5.000",
         "Pertalite rp30.000",
+        "pengeluaran parkir rp2000 pengeluaran sayur 5000 rupiah pemasukan ketemu paman di pasar dan dibekelin uang 50000 rupiah",
+        "pengeluaran beli daging ayam fillet seperempat kilo rp15000 sayur bayam wortel sawi kangkung total 15000 rupiah ketemu paman di pasar dan dibekelin uang 50000 rupiah"
     )
 
     // todo : hitung berapa datanya, tes pake regex mu, buat confusion matrix dan TENTUIN True False Negative Positivenya sendiri
     //  kata ku sih 100% akurat 😎👊
+
 
     testCaseData.forEach {
         val patterns = listOf("rp", "rupiah")
 
         println("Text: \"$it\"")
         println("Text Length: \"${it.length}\"")
-        println("Patterns: $patterns\n")
+        println("Patterns: $patterns")
 
-        val occurrences = boyerMooreSearchMultiplePatterns(it, patterns)
+        val occurrences1 = boyerMooreSearchMultiplePatterns(it, patterns)
+        val occurrences2 = boyerMooreMultiplePatternsWithReturn(it, patterns)
+//        val occurrences3 = boyerMooreMultiplePatterns(it, patterns)
 
-        println("occurrences : ${occurrences.keys.joinToString(", ")}")
+        println("occurrences1 : ${occurrences1.keys.joinToString(", ")} - ${occurrences1.values.joinToString(", ")}")
+        println("occurrences2 : ${occurrences2.keys.joinToString(", ")} - ${occurrences2.values.joinToString(", ")}")
+//        println("occurrences3 : $occurrences3")
         println("nominal : ")
-        nominalDescriptionSeparator(it, occurrences)
+        val results = inputtedTextToTransactionsConverter(it, occurrences2)
+
+        // bagus, sekarang hasilnya sudah sesuai ekspektasi
+        // (pengeluaran parkir, 2000)
+        // (pengeluaran sayur, 5000)
+        // (pemasukan ketemu paman di pasar dan dibekelin uang, 50000)
+
+
+        // sekarang saya harus mencari "transaction kind" dengan mengambil tiap tiap kata pertama pada result dan mencocokkannya dengan
+
+        // TransactionKind.REGULAR_EXPENSE -> "Pengeluaran"
+        // TransactionKind.REGULAR_INCOME -> "Pemasukan"
+        // TransactionKind.REGULAR_TRANSFER -> "Transfer"
+
+        // TransactionKind.SAVING_DEPOSIT -> "Setoran"
+        // TransactionKind.SAVING_WITHDRAWAL -> "Penarikan"
+
+        // TransactionKind.DEBT_PAYMENT -> "Hutang"
+        // TransactionKind.RECEIVABLE_PAYMENT -> "Piutang"
+
+        // TransactionKind.UNDEFINED -> "" // jika tidak ada satupun diatas
+
+        results.forEach { result ->
+            println(result)
+        }
 
         println("_____________________________________________")
         println("")

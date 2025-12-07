@@ -10,8 +10,8 @@ sealed interface InputTransactionEvent {
 
     data class SpeechToTransactionButtonClicked(val context: Context): InputTransactionEvent
     data object ResetInput: InputTransactionEvent
-
     data class HandleUserInput(val userInput: String): InputTransactionEvent
+    data object FinishInputing: InputTransactionEvent
 
     data object ReviseLaterCheckboxClicked: InputTransactionEvent
     data object TranscriptionErrorCheckboxClicked: InputTransactionEvent

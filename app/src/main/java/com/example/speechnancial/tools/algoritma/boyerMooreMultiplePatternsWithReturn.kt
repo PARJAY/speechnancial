@@ -2,13 +2,14 @@ package com.example.speechnancial.tools.algoritma
 
 import kotlin.math.max
 
-fun boyerMooreMultiplePatternsWithReturn(text: String, patterns: List<String>): Map<String, List<Int>> {
+fun boyerMooreMultiplePatternsWithReturn(
+    text: String,
+    patterns: List<String> = listOf("rp", "rupiah")
+): Map<String, List<Int>> {
     val textLength = text.length
     if (textLength == 0 || patterns.isEmpty()) return emptyMap()
 
     val sortedPatterns = patterns.sortedBy { it.length }
-
-    // Preprocessing: Membuat tabel bad character untuk semua pola
     val newBadCharTable = mutableMapOf<Char, Int>()
 
     val badCharTable = IntArray(256) { -1 }
@@ -32,24 +33,21 @@ fun boyerMooreMultiplePatternsWithReturn(text: String, patterns: List<String>): 
             if (shift + patternLength > textLength) continue
 
             var j = patternLength - 1
-            while (j >= 0 && pattern[j] == text[shift + j]) {
+            while (j >= 0 && pattern[j] == text[shift + j].lowercaseChar()) {
                 j--
             }
 
             if (j < 0) {
                 occurrences[pattern]!!.add(shift)
-                shift++ // Penting: Geser satu karakter untuk mencegah overlap
+                shift++
                 shifted = true
-                break // Keluar dari loop pola setelah menemukan satu pola
+                break
             }
         }
-        if (!shifted) { // Jika tidak ada pola yang ditemukan pada shift saat ini
-            var shiftAmount = 1
-            if (shift < textLength) {
-                val badCharIndex = text[shift].code
-                val badCharPos = badCharTable[badCharIndex]
-                shiftAmount = max(1, 0 - badCharPos)
-            }
+        if (!shifted) {
+            val badCharIndex = text[shift].lowercaseChar().code
+            val badCharPos = badCharTable[badCharIndex]
+            val shiftAmount = max(1, 0 - badCharPos)
             shift += shiftAmount
         }
     }
@@ -57,77 +55,107 @@ fun boyerMooreMultiplePatternsWithReturn(text: String, patterns: List<String>): 
     return occurrences
 }
 
-fun boyerMooreMultiplePatternsWithReturnAndDebug(text: String, patterns: List<String>): Map<String, List<Int>> {
+fun boyerMooreMultiplePatternsWithReturnAndDebug(
+    text: String,
+    patterns: List<String> = listOf("rp", "rupiah")
+): Map<String, List<Int>> {
+    println("[boyerMooreMultiplePatternsWithReturn] Mulai mencari pola...")
     val textLength = text.length
-    if (textLength == 0 || patterns.isEmpty()) return emptyMap()
-
-    println("Text: \"$text\"")
-    println("Patterns: ${patterns.joinToString(", ")}")
+    if (textLength == 0 || patterns.isEmpty()) {
+        println("   Branch: teks kosong atau pola kosong → return emptyMap()")
+        return emptyMap()
+    }
 
     val sortedPatterns = patterns.sortedBy { it.length }
-    println("Sorted Patterns: ${sortedPatterns.joinToString(", ")}")
+    println("   sortedPatterns: $sortedPatterns")
+    val newBadCharTable = mutableMapOf<Char, Int>()
 
-    // Preprocessing: Membuat tabel bad character untuk semua pola
     val badCharTable = IntArray(256) { -1 }
     for (pattern in sortedPatterns) {
         for (patternChar in pattern.indices) {
             badCharTable[pattern[patternChar].code] = patternChar
+            newBadCharTable[pattern[patternChar]] = patternChar
         }
     }
-    println("Bad Character Table: ${badCharTable.joinToString(", ")}")
 
     val occurrences = mutableMapOf<String, MutableList<Int>>()
     for (pattern in patterns) {
         occurrences[pattern] = mutableListOf()
     }
 
-    var shift = 0
-    while (shift <= textLength - 1) {
-        println("\nShift: $shift")
-        var shifted = false
-        // modify here
+//    var shift = 0
+//    while (shift <= textLength - 1) {
+//        var shifted = false
+//        for (pattern in patterns) {
+//            val patternLength = pattern.length
+//            if (shift + patternLength > textLength) {
+//                println("   Branch: pola keluar batas teks → continue")
+//                continue
+//            }
+//
+//            var j = patternLength - 1
+//            while (j >= 0 && pattern[j] == text[shift + j].lowercaseChar()) {
+//                j--
+//            }
+//
+//            if (j < 0) {
+//                println("   Pola ditemukan: '$pattern' di posisi $shift")
+//                occurrences[pattern]!!.add(shift)
+//                shift++
+//                shifted = true
+//                break
+//            }
+//        }
+//        if (!shifted) {
+//            val badCharIndex = text[shift].lowercaseChar().code
+//            val badCharPos = badCharTable[badCharIndex]
+//            val shiftAmount = max(1, 0 - badCharPos)
+//            println("   Tidak ada pola cocok, geser $shiftAmount posisi")
+//            shift += shiftAmount
+//        }
+//    }
 
+    var shift = 0
+    var noMatchCount = 0
+
+    while (shift <= textLength - 1) {
+        var shifted = false
         for (pattern in patterns) {
             val patternLength = pattern.length
-            if (shift + patternLength > textLength) {
-                println("Skipping pattern \"$pattern\" (out of bounds)")
-                continue
-            }
-
-            println("Checking pattern \"$pattern\" at position $shift")
+            if (shift + patternLength > textLength) continue
 
             var j = patternLength - 1
-            while (j >= 0 && pattern[j] == text[shift + j]) {
-                println("Match at text[${shift + j}] == pattern[$j] ('${text[shift + j]}')")
+            while (j >= 0 && pattern[j] == text[shift + j].lowercaseChar()) {
                 j--
             }
 
             if (j < 0) {
-                println("Pattern \"$pattern\" found at index $shift")
+                // Jika ada pengulangan "tidak cocok" sebelumnya, cetak dulu
+                if (noMatchCount > 0) {
+                    println("   Tidak ada pola cocok, geser 1 posisi - berulang sebanyak (${noMatchCount}x)")
+                    noMatchCount = 0
+                }
+
+                println("   Pola ditemukan: '$pattern' di posisi $shift")
                 occurrences[pattern]!!.add(shift)
-                shift++ // Geser satu karakter untuk mencegah overlap
+                shift++
                 shifted = true
-                break // Keluar dari loop pola setelah menemukan satu pola
-            } else {
-                println("Mismatch at text[${shift + j}] != pattern[$j] ('${text[shift + j]}' vs '${pattern[j]}')")
+                break
             }
         }
 
-        if (!shifted) { // Jika tidak ada pola yang ditemukan pada shift saat ini
-            var shiftAmount = 1
-            if (shift < textLength) {
-                val badCharIndex = text[shift].code
-                val badCharPos = badCharTable[badCharIndex]
-                shiftAmount = max(1, 0 - badCharPos)
-                println("Bad character '${text[shift]}' at index $shift, shift by $shiftAmount")
-            }
+        if (!shifted) {
+            noMatchCount++  // increment counter
+            val badCharIndex = text[shift].lowercaseChar().code
+            val badCharPos = badCharTable[badCharIndex]
+            val shiftAmount = max(1, 0 - badCharPos)
             shift += shiftAmount
         }
     }
 
-    println("\nOccurrences:")
-    occurrences.forEach { (pattern, indices) ->
-        println("Pattern \"$pattern\" found at indices ${indices.joinToString(", ")}")
+    // Jika masih ada pengulangan di akhir, cetak
+    if (noMatchCount > 0) {
+        println("   Tidak ada pola cocok, geser 1 posisi - berulang sebanyak (${noMatchCount}x)")
     }
 
     return occurrences

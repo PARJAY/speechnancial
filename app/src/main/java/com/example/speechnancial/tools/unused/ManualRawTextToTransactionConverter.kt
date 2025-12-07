@@ -1,6 +1,6 @@
 package com.example.speechnancial.tools.unused
 
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
 import com.example.speechnancial.common.pemasukanKeywords
 import com.example.speechnancial.common.pengeluaranKeywords
 
@@ -70,7 +70,7 @@ val input = "Beli ESP 32 rp. 100.000 breadboard 400 poin dua puluh delapan ribu 
 
 // Data class untuk model transaksi
 data class Transaction(
-    var type: TransactionType = TransactionType.UNDEFINED,
+    var type: TransactionTypeOld = TransactionTypeOld.UNDEFINED,
     val descriptions: MutableList<Pair<String, Float>> = mutableListOf()
 )
 
@@ -104,11 +104,11 @@ fun main() {
 
 
 // Identifikasi tipe transaksi
-fun identifyTransactionType(description: String): TransactionType {
+fun identifyTransactionType(description: String): TransactionTypeOld {
     return when {
-        pemasukanKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionType.EARNING
-        pengeluaranKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionType.SPENDING
-        else -> TransactionType.UNDEFINED
+        pemasukanKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionTypeOld.EARNING
+        pengeluaranKeywords.any { description.contains(it, ignoreCase = true) } -> TransactionTypeOld.SPENDING
+        else -> TransactionTypeOld.UNDEFINED
     }
 }
 

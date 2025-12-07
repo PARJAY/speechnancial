@@ -3,25 +3,27 @@ package com.example.speechnancial.data.model
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
+import com.google.firebase.Timestamp
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
 @Entity(tableName = "transactions")
 @Parcelize
 data class Transaction(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+//    @PrimaryKey(autoGenerate = true) val id: Int = 0,       // rubah jadi string
+    @PrimaryKey val id: String = "",       // rubah jadi string
     val rawText: String = "",
-    val type: TransactionType = TransactionType.UNDEFINED,
-    val details: List<TransactionDetail>? = null,
+    val type: TransactionTypeOld = TransactionTypeOld.UNDEFINED,
+    val detailsRoom: List<TransactionDetail>? = null,
+    val details: Map<String, Float>? = null,
     val total: Float = 0f,
-    val createdAt: LocalDateTime? = null,
+    val createdAtRoom: LocalDateTime? = null,
+    val createdAt: Timestamp? = null,
     val isReviseNeeded: Boolean = false,
     val isTranscriptionError: Boolean = false,
-    val isValid: Boolean = true
-
-    // TODO : isFromSmartwatch
+    val isValid: Boolean = true,
+    val isFromSmartwatch : Boolean = false
 ) : Parcelable
 
 @Parcelize
@@ -31,3 +33,5 @@ data class TransactionDetail(
 ) : Parcelable {
     fun emptyChecker() = description.isNotEmpty() && nominal > 0
 }
+
+

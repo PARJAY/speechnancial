@@ -1,6 +1,5 @@
 package com.example.speechnancial.ui.screen
 
-import android.widget.Space
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
 import com.example.speechnancial.data.model.Transaction
 import com.example.speechnancial.ui.component.transactionListScreen.TransactionItem
 import com.example.speechnancial.ui.component.transactionListScreen.WalletBalanceAndHistoryDisplayer
@@ -117,8 +116,8 @@ fun TransactionListScreenPreview() {
             state = TransactionListState(
                 transactionList = listOf(
                     Transaction(),
-                    Transaction(type = TransactionType.EARNING),
-                    Transaction(type = TransactionType.SPENDING)
+                    Transaction(type = TransactionTypeOld.EARNING),
+                    Transaction(type = TransactionTypeOld.SPENDING)
                 ),
 
             ),

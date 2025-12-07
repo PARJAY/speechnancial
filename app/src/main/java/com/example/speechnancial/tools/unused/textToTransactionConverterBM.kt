@@ -1,11 +1,5 @@
 package com.example.speechnancial.tools.unused
 
-import androidx.compose.runtime.MutableState
-import com.example.speechnancial.common.TransactionType
-import com.example.speechnancial.data.model.Transaction
-import com.example.speechnancial.tools.boyerMooreHorspoolSearch
-import com.example.speechnancial.tools.findTransactionType
-
 // now i dont even understand what im coding back then
 // i want to update this
 //  functiontipe transaksi :

@@ -31,7 +31,7 @@ fun CompactFAB(
 
         shape = CircleShape,
         modifier = Modifier
-            .padding(vertical = 16.dp)
+            .padding(vertical = 4.dp)
             .border(
                 width = 2.dp,
                 MaterialTheme.colorScheme.tertiary,
@@ -65,7 +65,7 @@ fun CompactFAB(
 
         shape = CircleShape,
         modifier = Modifier
-            .padding(vertical = 16.dp)
+            .padding(vertical = 4.dp)
             .border(
                 width = 2.dp,
                 MaterialTheme.colorScheme.tertiary,

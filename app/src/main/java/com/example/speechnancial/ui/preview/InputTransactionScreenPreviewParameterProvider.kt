@@ -6,7 +6,7 @@ import com.example.speechnancial.data.model.TransactionDetail
 import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
 
 val DUMMY_TRANSACTION_ITEM_STATE_4 = Transaction(
-    details = listOf(
+    detailsRoom = listOf(
         TransactionDetail("beli ESP", 120000f),
         TransactionDetail("DHT 11", 20000f),
         TransactionDetail("Breadboard", 100000f),

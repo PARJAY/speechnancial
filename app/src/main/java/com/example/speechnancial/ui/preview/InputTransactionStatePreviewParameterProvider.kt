@@ -1,7 +1,7 @@
 package com.example.speechnancial.ui.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
 import com.example.speechnancial.data.model.Transaction
 import com.example.speechnancial.data.model.TransactionDetail
 import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
@@ -14,9 +14,13 @@ class InputTransactionStatePreviewParameterProvider :
             previousPartialResult = "Partial result 1",
             source = "Source text 1",
             proposedTransaction = Transaction(
-                type = TransactionType.EARNING,
+                type = TransactionTypeOld.EARNING,
                 total = 12000f,
-                createdAt = LocalDateTime.now()
+                createdAtRoom = LocalDateTime.now(),
+                details = mapOf(
+                    "beli susu" to 10000f,
+                    "bayar parkir" to 2000f,
+                )
             ),
             isEditExistingTransaction = true,
             isReviseNeeded = true
@@ -25,9 +29,9 @@ class InputTransactionStatePreviewParameterProvider :
             previousPartialResult = "Partial result 2",
             source = "Source text 2",
             proposedTransaction = Transaction(
-                type = TransactionType.SPENDING,
+                type = TransactionTypeOld.SPENDING,
                 total = 12000f,
-                createdAt = LocalDateTime.of(2024, 3, 20, 20, 13, 0)
+                createdAtRoom = LocalDateTime.of(2024, 3, 20, 20, 13, 0)
             ),
             isTranscriptionError = true
         ),
@@ -35,10 +39,10 @@ class InputTransactionStatePreviewParameterProvider :
             previousPartialResult = "",
             source = "",
             proposedTransaction = Transaction(
-                type = TransactionType.EARNING,
+                type = TransactionTypeOld.EARNING,
                 total = 1_000_000f,
-                createdAt = LocalDateTime.now(),
-                details = listOf(
+                createdAtRoom = LocalDateTime.now(),
+                detailsRoom = listOf(
                     TransactionDetail("uang bulanan", 1_000_000f),
                 )
             ),
@@ -49,10 +53,10 @@ class InputTransactionStatePreviewParameterProvider :
             previousPartialResult = "",
             source = "",
             proposedTransaction = Transaction(
-                type = TransactionType.SPENDING,
+                type = TransactionTypeOld.SPENDING,
                 total = 285_000f,
-                createdAt = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
-                details = listOf(
+                createdAtRoom = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
+                detailsRoom = listOf(
                     TransactionDetail("beli ESP", 120_000f),
                     TransactionDetail("DHT 11", 20_000f),
                     TransactionDetail("Breadboard", 100_000f),

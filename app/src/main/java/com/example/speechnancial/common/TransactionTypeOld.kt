@@ -1,7 +1,8 @@
 package com.example.speechnancial.common
 
-enum class TransactionType {
+enum class TransactionTypeOld {
     UNDEFINED,
     EARNING,
-    SPENDING
+    SPENDING,
+    TRANSFER
 }

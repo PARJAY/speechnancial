@@ -32,6 +32,7 @@ fun CompactButton(onClick: () -> Unit, text: String, modifier: Modifier, backgro
             text,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

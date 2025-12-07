@@ -14,7 +14,6 @@ import com.example.speechnancial.ui.screen.InputTransactionScreen
 import com.example.speechnancial.ui.screen.TransactionListScreen
 import com.example.speechnancial.ui.theme.SpeechnancialTheme
 import com.example.speechnancial.viewmodel.inputTransactionScreen.InputTransactionState
-import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
 import com.example.speechnancial.viewmodel.transactionListScreen.TransactionListState
 import com.example.speechnancial.viewmodel.transactionListScreen.WalletQuickHistory
 

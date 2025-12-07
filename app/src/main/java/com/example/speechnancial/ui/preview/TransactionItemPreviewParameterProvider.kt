@@ -1,48 +1,52 @@
 package com.example.speechnancial.ui.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
 import com.example.speechnancial.data.model.Transaction
 import com.example.speechnancial.data.model.TransactionDetail
-import com.example.speechnancial.viewmodel.transactionListScreen.TransactionItemState
+import com.example.speechnancial.viewmodel.transactionListScreen.TransactionRoomItemState
 import java.time.LocalDateTime
 
-class TransactionItemPreviewParameterProvider: PreviewParameterProvider<TransactionItemState> {
-    override val values: Sequence<TransactionItemState>
+class TransactionItemPreviewParameterProvider: PreviewParameterProvider<TransactionRoomItemState> {
+    override val values: Sequence<TransactionRoomItemState>
         get() = sequenceOf(
-            TransactionItemState(
+            TransactionRoomItemState(
                 Transaction(
-                    type = TransactionType.EARNING,
+                    type = TransactionTypeOld.EARNING,
                     total = 12000f,
-                    createdAt = LocalDateTime.now(),
+                    createdAtRoom = LocalDateTime.now(),
+//                    createdAt = Timestamp.now(),
                 )
             ),
-            TransactionItemState(
+            TransactionRoomItemState(
                 Transaction(
-                    type = TransactionType.UNDEFINED,
+                    type = TransactionTypeOld.UNDEFINED,
                     total = 12000f,
-                    createdAt = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
+//                    createdAt = Timestamp.now(),
+                    createdAtRoom = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
                     isValid = false
                 )
             ),
-            TransactionItemState(
+            TransactionRoomItemState(
                 Transaction(
-                    type = TransactionType.EARNING,
+                    type = TransactionTypeOld.EARNING,
                     total = 1_000_000f,
-                    createdAt = LocalDateTime.now(),
-                    details = listOf(
+                    createdAtRoom = LocalDateTime.now(),
+//                    createdAt = Timestamp.now(),
+                    detailsRoom = listOf(
                         TransactionDetail("uang bulanan", 1_000_000f),
                     ),
                     isReviseNeeded = true
                 ),
                 true
             ),
-            TransactionItemState(
+            TransactionRoomItemState(
                 Transaction(
-                    type = TransactionType.SPENDING,
+                    type = TransactionTypeOld.SPENDING,
                     total = 285_000f,
-                    createdAt = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
-                    details = listOf(
+//                    createdAt = Timestamp.now(),
+                    createdAtRoom = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
+                    detailsRoom = listOf(
                         TransactionDetail("beli ESP", 120_000f),
                         TransactionDetail("DHT 11", 20_000f),
                         TransactionDetail("Breadboard", 100_000f),
@@ -51,12 +55,13 @@ class TransactionItemPreviewParameterProvider: PreviewParameterProvider<Transact
                 ),
                 true
             ),
-            TransactionItemState(
+            TransactionRoomItemState(
                 Transaction(
-                    type = TransactionType.UNDEFINED,
+                    type = TransactionTypeOld.UNDEFINED,
                     total = 285_000f,
-                    createdAt = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
-                    details = listOf(
+//                    createdAt = Timestamp.now(),
+                    createdAtRoom = LocalDateTime.of(2024, 3, 20, 20, 13, 0),
+                    detailsRoom = listOf(
                         TransactionDetail("beli ESP", 120_000f),
                         TransactionDetail("DHT 11", 20_000f),
                         TransactionDetail("Breadboard", 100_000f),

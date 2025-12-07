@@ -1,6 +1,6 @@
 package com.example.speechnancial.ui.screen
 
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -76,16 +76,16 @@ fun InputTransactionScreen(
             OutlinedTextField(
                 value = inputTransactionState.source + inputTransactionState.previousPartialResult,
                 onValueChange = {
-                    // kalok vm kosong, update state dan vm
+//                    // kalok vm kosong, update state dan vm
                     if (
                         inputTransactionState.source.isEmpty()
                         && inputTransactionState.previousPartialResult.isEmpty()
                     ) {
                         tempString.value = it
                         onEvent(InputTransactionEvent.HandleUserInput(tempString.value))
-//                        Log.d("ITScreen", "if 1 - tempString.value : ${tempString.value}")
+                        Log.d("ITScreen", "if 1 - tempString.value : ${tempString.value}")
                     } else {
-//                        Log.d("ITScreen", "if 1 - passed : ${tempString.value}")
+                        Log.d("ITScreen", "if 1 - passed : ${tempString.value}")
                     }
 
                     // kalok vm isi, state = vm, baru update vm
@@ -93,18 +93,18 @@ fun InputTransactionScreen(
                         tempString.value = inputTransactionState.source
                         tempString.value = it
                         onEvent(InputTransactionEvent.HandleUserInput(tempString.value))
-//                        Log.d("ITScreen", "if 2 - tempString.value : ${tempString.value}")
+                        Log.d("ITScreen", "if 2 - tempString.value : ${tempString.value}")
                     } else {
-//                        Log.d("ITScreen", "if 2 - passed : ${tempString.value}")
+                        Log.d("ITScreen", "if 2 - passed : ${tempString.value}")
                     }
 
                     // kalok udah sinkron, update state dan vm barengan
                     if (tempString.value == inputTransactionState.source) {
                         tempString.value = it
                         onEvent(InputTransactionEvent.HandleUserInput(tempString.value))
-//                        Log.d("ITScreen", "if 3 - tempString.value : ${tempString.value}")
+                        Log.d("ITScreen", "if 3 - tempString.value : ${tempString.value}")
                     } else {
-//                        Log.d("ITScreen", "if 3 - passed : ${tempString.value}")
+                        Log.d("ITScreen", "if 3 - passed : ${tempString.value}")
                     }
                 },
                 enabled = !inputTransactionState.isTranscribing,
@@ -119,20 +119,20 @@ fun InputTransactionScreen(
                     .fillMaxWidth()
                     .onFocusLost(
                         onFocusLost = {
-                            Toast.makeText(context, "focus lost", Toast.LENGTH_SHORT).show()
+                            onEvent(InputTransactionEvent.FinishInputing)
                             focusManager.clearFocus()
                         }
                     ),
                 shape = RoundedCornerShape(8.dp),
 
                 label = {
-                    if (inputTransactionState.source.isEmpty())
+                    if (inputTransactionState.source.isEmpty() || inputTransactionState.previousPartialResult.isEmpty())
                         Text(
-                            "Bicara atau Ketik \n Transaksi dapat lebih dari 1",
+                            "Input Dengan Bicara atau Mengetik. Transaksi yang diinputkan dapat lebih dari 1",
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                         )
                 },
             )

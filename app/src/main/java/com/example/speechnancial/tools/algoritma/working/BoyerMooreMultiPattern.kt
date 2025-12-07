@@ -3,14 +3,21 @@ package com.example.speechnancial.tools.algoritma.working
 
 //    print("rpiah teks rupiah untuk mencari rp dan rupiah lagi rupiah".length)
 
+// NOT WORKING
 fun main() {
     val text = "Pagi beli Laklak sama bikang Rp2.000 habis itu ke pasar Oh sebelum ke pasar beli risol Rp3.000 habis itu di pasar nemu dagang tuna ikan mentah beli tuna 1/4 kg kurang 11.000 rupiah setelah itu ke Tohpati di sana dapat kelepon Rp5.000"
     val patterns = listOf("rp", "rupiah")
 
-    println("Text: \"$text\"")
-    println("Patterns: $patterns\n")
+//    val text2 = "Bayar ojek 190.000 rupiah"
+    val text2 = "pengeluaran parkir rp2000 pengeluaran 5000 rupiah pemasukan ketemu paman di pasar dan dibekelin uang 50000 rupiah"
 
-    val occurrences = boyerMooreSearchMultiplePatternsWithDebug(text, patterns)
+    val text3 = "Beli mie goreng tukang kaki lima 15.000 rupiah"
+
+    println("Text: \"$text2\"")
+    println("Patterns: $patterns\n")
+    println("Text length: \"${text2.length}\"")
+
+    val occurrences = boyerMooreSearchMultiplePatternsWithDebug(text2, patterns)
 
     if (occurrences.isEmpty()) {
         println("Tidak ada pola yang ditemukan.")
@@ -57,7 +64,7 @@ fun boyerMooreSearchMultiplePatternsWithDebug(text: String, patterns: List<Strin
         occurrences[pattern] = mutableListOf()
     }
 
-    while (shift <= n - (shortestPatternLength + 1)) {
+    while (shift <= n - (shortestPatternLength)) {
         println("currently at shift $shift in text ${text[shift]}")
         var shifted = false
 
@@ -135,6 +142,10 @@ fun boyerMooreSearchMultiplePatternsWithDebug(text: String, patterns: List<Strin
             println("Shifting by max(1, $badCharShift)\n")
             shift += maxOf(1, badCharShift)
         }
+//        if (shift + shortestPatternLength <= n  && shift != n - (shortestPatternLength + 1)) {
+//            shift = 23
+//            println("last char reached")
+//        }
 //        else {
 //            shift++
 //        }
@@ -144,7 +155,10 @@ fun boyerMooreSearchMultiplePatternsWithDebug(text: String, patterns: List<Strin
 }
 
 
-fun boyerMooreSearchMultiplePatterns(text: String, patterns: List<String>) : Map<String, List<Int>> {
+fun boyerMooreSearchMultiplePatterns(
+    text: String,
+    patterns: List<String> = listOf("rp", "rupiah")
+) : Map<String, List<Int>> {
     // Sort patterns by length (ascending)
     val sortedPatterns = patterns.sortedBy { it.length }
 

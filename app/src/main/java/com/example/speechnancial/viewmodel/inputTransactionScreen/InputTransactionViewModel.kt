@@ -7,7 +7,7 @@ import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.speechnancial.common.TransactionType
+import com.example.speechnancial.common.TransactionTypeOld
 import com.example.speechnancial.data.dao.TransactionDao
 import com.example.speechnancial.data.datastore.WalletDataStoreManager
 import com.example.speechnancial.tools.createTransactionFromInput
@@ -72,7 +72,7 @@ class InputTransactionViewModel(
             is InputTransactionEvent.IsEditExistingTransactionData -> {
                 _state.update { it.copy(
                     proposedTransaction = event.transaction,
-                    source = event.transaction.details?.joinToString(separator = "\n") { detail ->
+                    source = event.transaction.detailsRoom?.joinToString(separator = "\n") { detail ->
                         "${detail.description} ${detail.nominal.toInt()} rupiah"
                     }?.ifEmpty { event.transaction.rawText }.toString(),
                     isEditExistingTransaction = true
@@ -80,9 +80,7 @@ class InputTransactionViewModel(
             }
 
             is InputTransactionEvent.IsCloseScreen -> {
-                _state.update {
-                    InputTransactionState()
-                }
+                _state.update { InputTransactionState() }
                 event.navController.navigateUp()
             }
 
@@ -168,11 +166,11 @@ class InputTransactionViewModel(
 
             is InputTransactionEvent.SaveTransaction -> {
                 viewModelScope.launch {
-                    transactionDao.insertTransaction(state.value.proposedTransaction)
-                    if (state.value.proposedTransaction.type == TransactionType.SPENDING) {
+//                    transactionDao.insertTransaction(state.value.proposedTransaction)
+                    if (state.value.proposedTransaction.type == TransactionTypeOld.SPENDING) {
                         updateTotalExpense(state.value.proposedTransaction.total)
                     }
-                    if (state.value.proposedTransaction.type == TransactionType.EARNING) {
+                    if (state.value.proposedTransaction.type == TransactionTypeOld.EARNING) {
                         updateTotalIncome(state.value.proposedTransaction.total)
                     }
 
@@ -180,13 +178,18 @@ class InputTransactionViewModel(
                 }
             }
 
+            // todo : masih ada 1 hal yang bisa jadi patokan update,
+            //  yaitu data total lama yang ada di transaction bisa jadi patokan
+            //  jadi nggak perlu nyari total spending gini
             InputTransactionEvent.UpdateTransaction -> {
                 viewModelScope.launch {
-                    transactionDao.updateTransaction(state.value.proposedTransaction)
-                    if (state.value.proposedTransaction.type == TransactionType.SPENDING) {
+                    // data will be in state
+
+//                    transactionDao.updateTransaction(state.value.proposedTransaction)
+                    if (state.value.proposedTransaction.type == TransactionTypeOld.SPENDING) {
                         setTotalOutcome(transactionDao.getTotalSpending())
                     }
-                    if (state.value.proposedTransaction.type == TransactionType.EARNING) {
+                    if (state.value.proposedTransaction.type == TransactionTypeOld.EARNING) {
                         setTotalIncome(transactionDao.getTotalEarning())
                     }
                 }
@@ -196,10 +199,12 @@ class InputTransactionViewModel(
 
             InputTransactionEvent.DeleteTransaction -> {
                 viewModelScope.launch {
-                    transactionDao.deleteTransaction(state.value.proposedTransaction)
+//                    transactionDao.deleteTransaction(state.value.proposedTransaction)
                     updateTotalExpense(-state.value.proposedTransaction.total)
                 }
             }
+
+            InputTransactionEvent.FinishInputing -> TODO()
         }
     }
 }

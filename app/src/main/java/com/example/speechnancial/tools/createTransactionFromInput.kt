@@ -1,56 +1,10 @@
 package com.example.speechnancial.tools
 
-import android.util.Log
-import androidx.compose.runtime.MutableState
-import com.example.speechnancial.common.TransactionType
-import com.example.speechnancial.data.model.Transaction
-import com.example.speechnancial.data.model.TransactionDetail
-import java.time.LocalDateTime
-import kotlin.math.log
-
-fun main() {
-    val text =
-        "Beli ESP 32 rp100 miliar 100 juta 100.000,000 " +
-        "dht rp 25.000 " +
-        "kabel jumper rp. 45.000.000.000.000 " +
-        "breadboard 400 poin rp 28.000 " +
-        "cuci uang korupsi bambang tambang timah rp 12 miliar 11 juta 19.111 " +
-        "cuci uang korupsi bambang tambang timah 12 miliar 11 juta 19.111 rupiah"
-
-    val result = createTransactionFromInput(text)
-    result.details?.forEach { transactionDetail ->
-        println(transactionDetail.description)
-        println(transactionDetail.nominal)
-        println()
-    }
-
-
-    val userInputTestCase1 = "Beli sabun 5000 rupiah sampo 15000 rupiah deterjen 20000 rupiah"
-
-    val userInputTestCase2 = "Beli sabun 5000 rupiah sampo pantene 25000 rupiah deterjen 20000 rupiah"
-    val previousTransactionTestCase2 = Transaction(
-        details = listOf(
-            TransactionDetail("Beli sabun ", 5000f),
-            TransactionDetail("sampo ", 15000f),
-            TransactionDetail("deterjen ", 20000f),
-        )
-    )
-
-    createTransactionFromInput(userInputTestCase1).details?.forEach { transactionDetail ->
-        println(transactionDetail.description)
-        println(transactionDetail.nominal)
-        println()
-    }
-
-    createTransactionFromInput(
-        userInputTestCase2,
-        0
-    ).details?.forEach { transactionDetail ->
-        println(transactionDetail.description)
-        println(transactionDetail.nominal)
-        println()
-    }
-}
+import com.example.speechnancial.data.firebase.model.Transaction
+import com.example.speechnancial.data.firebase.model.TransactionType
+import com.example.speechnancial.tools.algoritma.boyerMooreMultiplePatternsWithReturn
+import com.example.speechnancial.tools.algoritma.working.nominalDescriptionSeparator
+import com.google.firebase.Timestamp
 
 // todo : check what different before performing regex Regex denial of Service
 //  compare user raw input with previousTransaction to see where is the edit happened
@@ -61,73 +15,91 @@ fun main() {
 //     "${detail.description} ${detail.nominal.toInt()} rupiah"
 //  }
 
-fun createTransactionFromInput(
+// todo : pake boyer moore
+//  untested
+
+// saya ingin membuat list of transaction dari string yang diberikan
+// pertama buatlah test case
+
+//  saat kata masuk kedalam fungsi
+//  kata rp[nominal] atau [nominal] rupiah akan menjadi akhir dari sebuah transaksi dan di deteksi oleh algoritma boyerMoore dengan fungsi yang diberikan
+
+//  pengeluaran parkir rp2000 pengeluaran sayur 5000 rupiah pemasukan ketemu paman di pasar dan dibekelin uang 50000 rupiah
+//  kata paling awal akan menentukan transactionKind
+
+// TransactionKind.REGULAR_EXPENSE -> "Pengeluaran"
+// TransactionKind.REGULAR_INCOME -> "Pemasukan"
+// TransactionKind.REGULAR_TRANSFER -> "Transfer"
+
+// TransactionKind.SAVING_DEPOSIT -> "Setoran"
+// TransactionKind.SAVING_WITHDRAWAL -> "Penarikan"
+
+// TransactionKind.DEBT_PAYMENT -> "Hutang"
+// TransactionKind.RECEIVABLE_PAYMENT -> "Piutang"
+
+//  sisa kata diantara itu akan menjadi deskripsi
+
+// jika masih ada kata setelahnya, akan menjadi transaksi baru pada list of Transaction
+
+fun createTransactionWithBoyerMooreFromInputNew(
     userRawInput: String,
-    previousTransactionId: Int = 0
-) : Transaction {
-    val extractedNominalList : List<String> = nominalExtractorRegex(userRawInput).toList()
-    val extractedDescriptionList: MutableList<Pair<String, String>> = descriptionExtractorNew(userRawInput, extractedNominalList.asSequence())
+    previousTransactionId: String = ""
+): Transaction {
+    val extractedNominalAndDescriptionList = boyerMooreMultiplePatternsWithReturn(userRawInput)
+    val results = nominalDescriptionSeparator(userRawInput, extractedNominalAndDescriptionList)
 
-    val details = extractedDescriptionList.map { (description, nominal) ->
-        TransactionDetail(
-            description = description,
-            nominal = parseNominalToFloat(nominal)
-        )
+    val details = results.associate { (description, nominal) ->
+        description to parseNominalToFloat(nominal)
     }
 
-    var transactionType: TransactionType = TransactionType.UNDEFINED
-    val firstDetail : Pair<String, String>? = extractedDescriptionList.firstOrNull()
-    if (firstDetail != null) {
-        val (description) = firstDetail
-        transactionType = findTransactionType(description.split(" ")[0].lowercase())
-    }
-
-    val friendlyToEditRawText = details.joinToString(separator = " ") { detail ->
-        "${detail.description} ${detail.nominal.toInt()} rupiah"
+    val friendlyToEditRawText = details.entries.joinToString(" ") { (description, nominal) ->
+        "$description ${nominal.toInt()} rupiah"
     }.ifEmpty { userRawInput }
 
-//    Log.d("friendlyToEditRawText", friendlyToEditRawText)
+    var transactionType: TransactionType = TransactionType.UNDEFINED
+
+    val firstDetail: Pair<String, String>? = results.firstOrNull()
+
+    if (firstDetail != null) {
+        val (description) = firstDetail
+        transactionType = findTransactionKind(description.split(" ")[0].lowercase())
+    }
 
     return Transaction(
-        id = previousTransactionId,
-        rawText = friendlyToEditRawText,
-        type = transactionType,
-        details = details,
-        total = details.sumOf { it.nominal.toInt() }.toFloat(),
-        createdAt = LocalDateTime.now(),
-        isReviseNeeded = details.any { !it.emptyChecker() },
-        isValid = transactionType != TransactionType.UNDEFINED && details.all { it.emptyChecker() }
+        uuid = previousTransactionId,
+        fullText = friendlyToEditRawText,
+        transactionTypeOrdinal = transactionType.ordinal,
+        details = details.filterKeys { it.isNotBlank() }.ifEmpty { null }, // Filter out blank descriptions
+        total = details.values.sum(),
+        dateAdded = Timestamp.now(),
+        isNeedRevise = false,
+        isValid = details.any { (description, nominal) -> description.isNotBlank() && nominal > 0 },
+        isFromSmartwatch = false
     )
 }
 
-fun createTransactionFromInputWithDebug(userRawInput: String, transaction : MutableState<Transaction>): Transaction {
-    val extractedNominalList = nominalExtractorRegex(userRawInput).toList()
-    val extractedDescriptionList = descriptionExtractor(userRawInput, extractedNominalList.asSequence())
-
-    extractedNominalList.forEach {
-        Log.d("extractedNominalList", it)
+fun findTransactionKind(firstWord: String): TransactionType {
+    return when (firstWord) {
+        "pengeluaran" -> TransactionType.EXPENSE
+        "pemasukan" -> TransactionType.INCOME
+        "transfer" -> TransactionType.REGULAR_TRANSFER
+        "setoran" -> TransactionType.SAVING_DEPOSIT
+        "penarikan" -> TransactionType.SAVING_WITHDRAWAL
+        "hutang" -> TransactionType.DEBT_PAYMENT
+        else -> TransactionType.UNDEFINED
     }
+}
 
-    val details = extractedDescriptionList.map { (description, nominal) ->
-        TransactionDetail(
-            description = description,
-            nominal = parseNominalToFloat(nominal)
-        )
-    }
+// harus menjelaskan fungsi boyerMooreMultiplePatternsWithReturn pada AI
+// harus membuat AI untuk mengenerate Test case yang lebih kompleks seperti multiple Transaction pada input string yang diberikan
+// karena fungsi ini akan digunakan pada create dan update saya harus membuat fungsi ini fleksibel, dan menjelaskan alur data pada AInya
 
-    var transactionType: TransactionType = TransactionType.UNDEFINED
-    val firstDetail = extractedDescriptionList.firstOrNull()
-    if (firstDetail != null) {
-        val (description) = firstDetail
-        transactionType = findTransactionType(description.split(" ")[0].lowercase())
-    }
+fun main() {
+    val input1 = "pengeluaran parkir rp2000 pengeluaran sayur 5000 rupiah pemasukan ketemu paman di pasar dan dibekelin uang 50000 rupiah"
+    val transactions1 = mutableListOf<Transaction>()
+    val remainingInput1 = input1
+    val previousId1 = ""
 
-    return  Transaction(
-        rawText = userRawInput,
-        type = transactionType,
-        details = details,
-        createdAt = LocalDateTime.now(),
-        isReviseNeeded = details.any { !it.emptyChecker() },
-        isValid = transactionType != TransactionType.UNDEFINED && details.all { it.emptyChecker() }
-    )
+    val transaction = createTransactionWithBoyerMooreFromInputNew(remainingInput1, previousId1)
+    print(transaction.details)
 }

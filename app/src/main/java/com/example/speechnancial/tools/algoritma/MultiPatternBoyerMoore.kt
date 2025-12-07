@@ -56,7 +56,8 @@ fun boyerMooreMultiplePatterns(text: String, patterns: List<String>): List<Int> 
 }
 
 fun main() {
-    val text = "rpaah teks rupiah untuk mencari rp dan rupiah"
+//    val text = "rpaah teks rupiah untuk mencari rp dan rupiah"
+    val text = "pengeluaran parkir rp2000 pengeluaran 5000 rupiah pemasukan ketemu paman di pasar dan dibekelin uang 50000 rupiah"
     val patterns = listOf("rp", "rupiah")
     val occurrences = boyerMooreMultiplePatterns(text, patterns)
 
